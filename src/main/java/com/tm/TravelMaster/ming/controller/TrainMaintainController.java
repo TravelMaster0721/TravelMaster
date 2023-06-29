@@ -26,7 +26,7 @@ import com.tm.TravelMaster.ming.model.TranInfo;
 
 @Controller
 public class TrainMaintainController {
-
+ 
 	@Autowired
 	private HighSpeedRailService highSpeedRailService;
 
