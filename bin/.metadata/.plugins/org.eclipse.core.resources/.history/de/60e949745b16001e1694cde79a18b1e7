@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>台灣高鐵時刻表與票價查詢</title>
+</head>
+<body th:onload="showPrice()">
+
+	<div th:replace="~{layout/indexHeader}"></div>
+
+	<main>
+		<form>
+			<article class="py-5 text-center container">
+				<div>
+					<h3>台灣高鐵時刻表與票價查詢</h3>
+				</div>
+				<hr>
+				<section class="timetable-search-frame bg-grey">
+					<div class="container">
+						<div class="p-3 mb-2 bg-light border border-2 rounded">
+							<div class="inline-input-group row">
+								<div class="col">
+									<label for="departureST">出發站：</label> <select id="departureST"
+										name="departureST" class="form-control mt-0 select-type01"
+										title="出發站" th:onchange="showPrice()">
+										<option th:each="station:${stationList}"
+											th:value="${station.stationID}"
+											th:text="${station.stationName}"></option>
+									</select>
+								</div>
+								<div class="col-input col">
+									<label for="destinationST" class="t1">抵達站：</label> <select
+										id="destinationST" name="destinationST"
+										class="form-control mt-0 select-type01" title="到達站"
+										th:onchange="showPrice()">
+										<option th:each="station:${stationList}"
+											th:value="${station.stationID}"
+											th:text="${station.stationName}"></option>
+									</select>
+								</div>
+
+								<div class="col-input col">
+									<label class="input-smalllabel" for="typeOfTicket"> 票種
+									</label> <select class="form-control mt-0 select-type01" title="票種"
+										id="typeOfTicket">
+										<option value="tot-1" selected>單趟</option>
+										<!-- <option value="tot-2" selected>來回</option> -->
+									</select>
+								</div>
+								<div class="col-input col-2">
+									<label class="input-smalllabel" for="departuredate">出發日期</label>
+									<input id="departuredate" type="Date" 
+										class="form_date form-control">
+								</div>
+								<div class="col-input col-2">
+									<label class="input-smalllabel" for="departureTime">出發時刻</label>
+									<input id="departureTime" type="Time"
+										class="form_date form-control">
+								</div>
+								<div class="col-input col">
+									<label class="input-smalllabel" for="typesofticket">
+										參考票價 </label> <input type="text" id="price" name="price"
+										 class="form-control mt-0 select-type01">
+								</div>
+								<div class="col-input col" th:if="${session.mbsession == null}">
+									<button type="button" title="查詢" 
+										class="btn btn-secondary  mt-3" id="start-search"
+										th:onclick="search()">查詢</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div>
+						<hr>
+						<div class="container" id="queryResult" style="display: none">
+							<div class="row ">
+								<div class="col d-flex justify-content-start">
+									<div id="from_st" class="d-inline p-2 fs-5"></div>	<!--  出發站 -->
+									<div class="d-inline p-2 fs-5"><i class="fa-solid fa-arrow-right"></i></div> <!-- 箭頭 -->
+									<div id="to_st" class="d-inline p-2 fs-5"></div>	<!-- 抵達站 -->
+									<div id="dep_date" class="d-inline p-2 fs-5"></div>	<!-- 出發日期 -->
+								</div>
+							</div>
+							<div class="row">
+
+								<table
+									class="table table-bordered table-striped table-sm table table-striped table-hover">
+									<thead class="table-light">
+										<tr>
+											<th scope="col" class="align-middle">車次</th>
+											<th scope="col" class="align-middle">出發時間</th>
+											<th scope="col" class="align-middle">抵達時間</th>
+											<th scope="col" class="align-middle">搭乘時間</th>
+											<!-- 	<th scope="col" class="align-middle">剩餘位數</th> -->
+											<th scope="col" class="align-middle">訂票</th>
+										</tr>
+									</thead>
+									<tbody id="queryContent" class="justify-content-center">
+									</tbody>
+								</table>
+								 <div id="pagination" style="display: flex;justify-content: center;align-items: center;"></div> 
+							</div>
+						</div>
+					</div>
+					<input type="hidden" id="priceInfos" name="priceInfos"
+						th:value='${priceInfos}' />
+				</section>
+			</article>
+			<input type="hidden" name="action" value="" />
+		</form>
+	</main>
+
+	<div th:replace="~{layout/indexFooter}"></div>
+	<script th:src="@{js/ming/SelectPageJS.js}"></script>
+	<script th:src="@{/js/ming/sweetalert2.js}"></script>
+</body>
+</html>

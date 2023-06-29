@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<title>套裝行程</title>
+	<!-- 購物車套件 -->
+	<link th:href="@{/css/sean/ShoppingCart.css}" rel="stylesheet">
+	
+</head>
+
+<body>
+	<div th:replace="~{layout/indexHeader}"></div>
+	<main>
+		<section>
+			<div class="container">
+				<main>
+					<!-- 輸入優惠碼 -->
+					<div class="basket">
+						<div class="basket-module">
+							<label for="promo-code"></label> 
+							<input id="promo-code" type="text" name="promo-code" maxlength="5" class="promo-code-field" placeholder="輸入優惠碼:">
+							<button class="promo-code-cta">送出</button>
+						</div>
+						
+						<!-- 購物車表頭 -->
+						<div class="basket-labels">
+							<ul>
+								<li class="item item-heading">行程</li>
+								<li class="price">價錢</li>
+								<li class="quantity">數量</li>
+								<li class="subtotal">小計</li>
+							</ul>
+						</div>
+						
+						<!-- 購物車商品 -->
+						<div class="cart-items">
+						<th:block th:each="product : ${products}">
+							<form method="post" th:action="@{/sean/RemoveCartItem}">
+								<div th:class="${'product-' + product.productId} +' '+'basket-product'" th:data-productId="${product.productId}">
+									<div class="item">
+										<div class="product-image">
+											<img th:src="@{'/sean/getImage/' + ${product.productId}}" th:alt="${product.productName}"/>
+										</div>
+										<div class="product-details">
+											<h1 style="font-size: 20px">
+												<strong th:text="${product.productName}"></strong>
+											</h1>
+											<p>
+												<strong>行程類型: <span th:text="${product.productType}"></span></strong>
+											</p>
+											<p>
+												產品編號:
+												<span th:text="${product.productId}"></span>
+											</p>
+										</div>
+									</div>
+									<div class="price" th:text="${product.productPrice}"></div>
+									<div>
+									<input type="number" name="productRegistrations" th:value="${product.productRegistrations}" min="1" th:max="${product.productQuantity}" class="quantity-field"
+    									th:data-price="${product.productPrice * product.productRegistrations}" />
+										<input type="hidden" name="productQuantity" th:value="${product.productQuantity}" class="productQuantity" />
+										<input type="hidden" name="productId" th:value="${product.productId}" class="productId" />
+										<input type="hidden" name="productName" th:value="${product.productName}" />
+										<input type="hidden" name="productPrice" th:value="${product.productPrice}" />
+									</div>
+									<div class="subtotal subtotal1"
+										th:text="${product.productPrice * product.productRegistrations}"></div>
+									<div class="remove">
+										<button type="submit"><i class="fa-solid fa-trash-can"></i> delete</button>
+									</div>
+								</div>
+							</form>
+						</th:block>
+						</div>
+					</div>
+					
+					<!-- 結帳欄位 -->
+					<aside>
+						<div class="summary">
+							<div>
+								共計 <span class="total-items"></span> 件商品
+							</div>
+							<br>
+							<div class="summary-total">
+								<div class="total-title">總價</div>
+								<div class="total-value final-value" id="basket-total"></div>
+							</div>
+							<div>
+								<!-- 結帳按鈕進度在這 -->
+								<form id="checkout-form" method="post" th:action="@{/sean/checkOut}">
+									<button class="checkout-cta" type="submit">結帳</button>
+								</form>
+								<!-- 結帳按鈕進度在這 -->
+							</div>
+						</div>
+					</aside>
+				</main>
+			</div>
+		</section>
+	</main>
+	<div th:replace="~{layout/indexFooter}"></div>
+	
+	<!-- 購物車js -->
+	<script th:src="@{/js/sean/ShoppingCart.js}"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Forum backstage</title>
+</head>
+<body>
+	<div th:replace="~{layout/dashboardHeader}"></div>
+	<main>
+		<div class="container-fluid px-4">
+			<h1 class="mt-4">後臺管理系統</h1>
+			<hr>
+			<div class="card mb-4">
+				<div class="card-header">
+					<i class="fas fa-table me-1"></i>
+				</div>
+				<div class="card-body">
+					<table id="articles" class="display" style="width: 100%">
+
+						<thead>
+							<tr>
+								<th>文章編號</th>
+								<th>文章名稱</th>
+								<th>會員名稱</th>
+								<th>發佈日期</th>
+								<th>文章類別</th>
+								<th>文章內容</th>
+								<th>文章圖片</th>
+								<th>狀態</th>
+								<th>N/A</th>
+								
+
+							</tr>
+						</thead>
+						<tbody>
+						<th:block th:each="article : ${articles}">
+							<tr>
+								<td th:text=${article.articleId}></td>
+								<td th:text=${article.articleName}></td>
+								<td th:text=${article.memberNum}></td>
+								<td th:text=${article.articleDate}></td>
+								<td th:text=${article.articleType}></td>
+								<td th:text=${article.articleContent}></td>
+								<td ><img class="rounded m-2 end-0"
+										style="width: 160px; height: 160px;" alt="..."
+										th:src="@{'/forum/getImage/'+${article.articleId}}" /></td>
+								<td>aa</td>
+								<td>aa</td>
+							</tr>
+						</th:block>	
+
+						</tbody>
+
+					</table>
+
+				</div>
+
+			</div>
+		</div>
+
+	</main>
+	<script>
+
+		$(document).ready(function () {
+		    $('#articles').DataTable();
+		});
+	</script>
+	<div th:replace="~{layout/dashboardFooter}"></div>
+
+
+
+</body>
+</html>

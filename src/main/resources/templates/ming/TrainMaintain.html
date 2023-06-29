@@ -1,64 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
 <head>
 <meta charset="utf-8" />
 <title>台灣高鐵班次維護</title>
-<style>
-.drag-file {
-	background-color: #FFF5EE;
-	border: 1px dashed;
-	height: 300px;
-	width: 350px;
-	border-radius: 15px; 
-	font-weight: 400;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-direction: column;
-}
-
-.drag-file.active {
-	border: 2px solid #708090;
-}
-
-.drag-file .icon {
-	font-size: 30px;
-	color: #708090;
-}
-
-.drag-file h6 {
-	font-size: 20px;
-	font-weight: 300;
-	color: #708090;
-}
-
-.drag-file span {
-	font-size: 14px;
-	font-weight: 300;
-	color: #708090;
-	margin: 10px 0 15px 0;
-}
-
-.drag-file button {
-	padding: 10px 25px;
-	font-size: 14px;
-	font-weight: 300;
-	border: none;
-	outline: none;
-	background: transparent;
-	color: #708090;
-	border: 1px solid #708090;
-	border-radius: 5px;
-	cursor: pointer;
-	transition: all 0.5s;
-}
-
-.drag-file button:hover {
-	background-color: #708090;
-	color: #FFFAFA;
-}
-</style>
+<link th:href="@{/css/ming/TrainMaintainCSS.css}" rel="stylesheet" />
 </head>
 
 <body>
@@ -160,24 +105,28 @@
 				<div class="modal-content">
 					<div class="modal-header" style="justify-content: center;">
 						<h5 class="modal-title" id="BatchUploadModalTitle">
-							<i class="fa-solid fa-cloud-arrow-up"></i>&nbsp;批次新增資料
+							批次新增資料
 						</h5>
 					</div>
 					<div class="modal-body">
-						<div class="input-group container">
-							<div class="input-group mb-3 p-2">
-								<input type="file" class="form-control" id="batchFileInput"
-									accept=".csv">
-							</div>
-							<div class="drag-file w-100 mb-3 p-2 d-flex justify-content-center" style="border-radius: 15px">
+						<div id="FileField" class="container">
+							<div
+								class="drag-file w-100 mb-3 p-2 d-flex justify-content-center"
+								style="border-radius: 15px">
 								<div class="icon">
 									<i class="fas fa-cloud-upload-alt"></i>
 								</div>
-								<h6>Drag & Drop File Here</h6>
-								<span>OR</span>
-								<button>Browse File</button>
-								<input type="file" hidden  accept=".csv">
+
+								<h6>請將檔案拖放到此處</h6>
+
+								<label for="batchFileInput" class="drag-file-label">
+									選擇檔案 </label> <input type="file" id="batchFileInput"
+									name="batchFileInput" accept=".csv" style="display: none">
+								<span id="SelectedFileName">No file selected</span>
 							</div>
+						</div>
+
+						<div class="container">
 							<div class="w-100 p-2 d-flex justify-content-center">
 								<button id="BatchUploadSubmit" onclick="uploadBatchData()"
 									class="btn btn-secondary">上傳</button>
@@ -324,7 +273,53 @@
 			});
 		}
 		
+		// drag and drop config
+		const batchFileInput = document.querySelector("#batchFileInput");
+		const dropZone = document.querySelector("#FileField");
+
+		dropZone.addEventListener("dragenter", function (e) {
+		     e.preventDefault();
+		});
+		
+		dropZone.addEventListener("dragover", function (e) {
+		     e.preventDefault();
+		});
+		
+		dropZone.addEventListener("dragleave", function (e) {
+		     e.preventDefault();
+		});
+		dropZone.addEventListener("drop", function (e) {
+		    e.preventDefault();
+		
+		    const fileName = e.dataTransfer.files[0].name;
+		    //document.querySelector("#SelectedFileName").textContent = fileName;
+		    
+		    
+		    batchFileInput.files = e.dataTransfer.files;
+		    batchFileInput.dispatchEvent(new Event('change'));
+		});
+		
+		batchFileInput.addEventListener("change", function (e) {
+			if(e.target.files.length > 0){
+				if(e.target.files[0].type != "text/csv"){
+					Swal.fire(
+							"選擇檔案失敗",
+							"僅支援CSV檔案格式",
+							"error"
+							);
+					return;
+				}
+			    const fileName = e.target.files[0].name;
+			    document.querySelector("#SelectedFileName").textContent = fileName;
+			}else{
+				document.querySelector("#SelectedFileName").textContent = "No file selected";
+			}
+		});
+		
+		//  Batch Modal Show/Hide
 		function openBatchModal() {
+			batchFileInput.value="";
+			batchFileInput.dispatchEvent(new Event('change'));
 			$("#BatchUploadModal").modal("show");
 			$("#BatchUploadModal").css("z-index", "1500");
 		}
@@ -337,30 +332,28 @@
 		function uploadBatchData() {
 			let fileInput = document.getElementById("batchFileInput");
 			let file = fileInput.files[0];
-			
-
 			if (file) {
 				let formData = new FormData();
 				formData.append("file", file);
 
-				fetch("batchUploadEndpoint", {
+				fetch("services/BatchUploadTrainInfo", {
 					method: "POST",
 					body: formData
 				})
 					.then(response => response.json())
 					.then(data => {
-						if (data.success) {
+						if (data.result) {
 							Swal.fire(
 								"上傳成功",
-								"批次資料上傳成功",
+								data.msg,
 								"success"
 							).then(() => {
-								location.reload(); // Refresh the page after successful upload
+								location.reload(); 
 							});
 						} else {
 							Swal.fire(
 								"上傳失敗",
-								"批次資料上傳失敗",
+								data.msg,
 								"error"
 							);
 						}

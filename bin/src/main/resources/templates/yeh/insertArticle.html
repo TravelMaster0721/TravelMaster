@@ -1,0 +1,76 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<title>Travel Master</title>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<!-- Bootstrap CSS -->
+
+</head>
+
+<body class="bg-primary-subtle d-grid gap-2">
+
+	<!-- 導航欄 -->
+	<div th:replace="~{layout/indexHeader}"></div>
+
+	<div class="h-100 container rounded p-2 h-75">
+		<div class="row ">
+			<div class="col-12">
+				<form method="post" th:action="@{/forum/insertArticle}"
+					enctype="multipart/form-data">
+					<div class="mb-3">
+						<label for="title" class="form-label">文章標題</label> <input
+							type="text" class="form-control" id="title" name="articleName">
+					</div>
+					<div class="mb-3">
+						<label for="articleType" class="form-label">文章類型</label> <select
+							class="form-select form-select-sm mb-3"
+							 name="articleType">
+							<option disabled selected>請選擇您的文章分類--</option>
+							<option value="北台灣">北台灣</option>
+							<option value="西台灣">西台灣</option>
+							<option value="南臺灣">南臺灣</option>
+							<option value="東台灣">東台灣</option>
+							<option value="旅遊攻略">旅遊攻略</option>
+							<option value="旅遊注意事項">旅遊注意事項</option>
+						</select>
+					</div>
+					<div class="mb-3">
+						<label for="pic" class="form-label">圖片</label> <input
+							class="form-control" type="file" id="pic" name="articlePic">
+					</div>
+					<div class="mb-3">
+						<label for="content" class="form-label">文章內容</label>
+						<textarea class="form-control" name="articleContent" id="content"
+							rows="10"></textarea>
+					</div>
+					<div class="mb-3">
+						發文規定 <br> 一.禁止發表與本板主旨無關的內容。 <br>
+						二、禁止使用不雅字眼、中傷、歧視、挑釁或謾罵他人。 <br> 三、請勿短時間內張貼大量重複內容。 <br>
+						四、文章內文字數需多於 15 個繁體中文字。 <br>
+						五、若文章中有部分內容與事實不符，請適度在標題或內文、留言中標示。未標示並經他人檢舉提出明確證據，且態度不佳者，將斟酌處分，情節嚴重可能永久停權。
+						<br>
+					</div>
+
+					<div class="text-center">
+						<button type="submit" class="btn btn-primary">Submit</button>
+					</div>
+				</form>
+			</div>
+				<div class="col">TEST</div>
+		</div>
+	</div>
+
+	<!-- Script CDN -->
+
+
+	<!-- Script Coding -->
+	<script>
+		
+	</script>
+</body>
+
+</html>
