@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>台灣高鐵訂票及選位系統</title>
+<link th:href="@{/css/ming/ChoosePageCSS.css}" rel="stylesheet" />
+</head>
+<body th:onload="initSeats();">
+	<div th:replace="~{layout/indexHeader}"></div>
+
+	<main class="row">
+		<div class="col-1"></div>
+		<div class="col-10">
+			<table class="table">
+				<tr class="row">
+					<td class="col-7">
+						<div class="article">
+							<div class="section">
+								<div class="row">
+									<h2 class="col  text-center">台灣高鐵座位圖</h2>
+								</div>
+								<h6 class="col  text-center">
+									<i class="fa-solid fa-caret-down"></i>&nbsp;&nbsp;請點選座位完成訂票
+								</h6>
+								<div class="row">
+									<div class="col">
+										<table class="table table-bordered border-dark table-sm">
+											<tbody id="seats_container" class="text-center">
+												<!-- Init by function initSeats() -->
+											</tbody>
+										</table>
+									</div>
+
+								</div>
+							</div>
+						</div>
+					</td>
+					<td class="col-1"></td>
+					<td class="col-4">
+						<div class="aside">
+							<div class="row">
+								<div class="section">
+									<h2 style="text-align: center;">訂票紀錄</h2>
+									<form>
+										<div class="input-group mb-3 p-2">
+											<span class="input-group-text">會員姓名</span><input
+												type="text" class="form-control" placeholder="請在此輸入您的姓名">
+										</div>
+										<div class="row">
+											<div class="form-floating mb-3 col-6">
+												<div class="form-control fs-5" id="DepartureDate"
+													style="text-align: center;"
+													th:text="${trainTimeInfo.getDepartureDate()}"></div>
+												<label for="DepartureDate">出發日期 :</label>
+											</div>
+											<div class="form-floating mb-3 col-6">
+												<div class="form-control fs-5" id="TranNo"
+													style="text-align: center;"
+													th:text="${trainTimeInfo.getTranNo()}"></div>
+												<label for="TranNo">車次 :</label>
+											</div>
+										</div>
+										<div class="row">
+											<div class="form-floating mb-3 col-6">
+												<div class="form-control fs-5" id="DepartureTime"
+													style="text-align: center;"
+													th:text="${trainTimeInfo.getDepartureTime()}"></div>
+												<label for="DepartureTime">發車時間 :</label>
+											</div>
+											<div class="form-floating mb-3 col-6">
+												<div class="form-control fs-5" id="ArrivalTime"
+													style="text-align: center;"
+													th:text="${trainTimeInfo.getArrivalTime()}"></div>
+												<label for="ArrivalTime">抵達時間 :</label>
+											</div>
+										</div>
+										<div class="row">
+											<div class="form-floating mb-3 col-6">
+												<div class="form-control fs-5" id="DepartureStation"
+													style="text-align: center;"
+													th:text="${trainTimeInfo.getDepartureST()}"></div>
+												<label for="DepartureStation">出發站 ：</label>
+											</div>
+											<div class="form-floating mb-3 col-6">
+												<div class="form-control fs-5" id="ArrivalStation"
+													style="text-align: center;"
+													th:text="${trainTimeInfo.getDestinationST()}"></div>
+												<label for="ArrivalStation">抵達站 ：</label>
+											</div>
+										</div>
+										<div class="mb-3 p-2">
+											<label for="selectedSeats">已選座位 ： </label>
+											<div class="form-control" id="selectedSeats">&nbsp;</div>
+										</div>
+										<div class="row">
+											<div class="form-floating mb-3 col-6">
+												<div class="form-control fs-5" id="price"
+													style="text-align: center;"
+													th:text="${singlePrice} + '&nbsp;元'"></div>
+												<label for="price">每張單價 ：</label>
+											</div>
+											<div class="form-floating mb-3 col-6">
+												<div class="form-control fs-5" id="priceTotal"
+													style="text-align: center;">0&nbsp;元</div>
+												<label for="priceTotal">總共票價 ：</label>
+											</div>
+										</div>
+										<div style="text-align: center;">
+											<button type="submit" class="btn btn-dark" th:onclick="submit()">加入購物車</button>
+											<button type="reset" class="btn btn-dark" th:onclick="cancel()">取消訂票</button>
+										</div>
+									</form>
+									<input type="hidden" id="singlePrice" th:value="${singlePrice}">
+								</div>
+							</div>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</main>
+
+	<div th:replace="~{layout/indexFooter}"></div>
+	<script th:src="@{/js/ming/ChoosePageJS.js}"></script>
+	<script th:src="@{/js/ming/sweetalert2.js}"></script>
+</body>
+</html>

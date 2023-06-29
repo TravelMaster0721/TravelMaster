@@ -1,0 +1,233 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>Travel Master</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+</head>
+
+<body>
+
+
+	<!-- 導航欄 -->
+	<div th:replace="~{layout/indexHeader}"></div>
+	<main>
+
+		<div class="bg-primary-subtle d-grid gap-3 container">
+			<div class="row">
+				<!-- 左側導航欄 -->
+				<div class="col-2 m-3 p-0">
+					<div  class="flex-column align-items-stretch p-0" style="position: fixed;">
+						<img th:src="@{/images/member.jpg}" class="rounded" alt="account" style="height: 200px;width:200px;">
+						<th:block th:with="article=${#lists.isEmpty(articles) ? null : articles[0]}">
+							<h5 th:text="${'會員名稱:' + (article != null ? article.member.memberName : '')}"></h5>
+						</th:block>
+
+						<li class="list-group-item list-group-item-action mb-1 rounded" style="border: none;"><a
+								th:href="@{/forum/intoForumPage}" style="color: black"> <i
+									class="fa-solid fa-list fa-lg"></i>
+								論壇
+							</a></li>
+						<li class="list-group-item list-group-item-action mb-1 rounded" style="border: none;"><a
+								th:href="@{/forum/personalPage}" style="color: black"><i
+									class="fa-solid fa-newspaper fa-lg"></i>
+								我的文章</a></li>
+						<li class="list-group-item list-group-item-action mb-1 rounded" style="border: none;"><a
+								th:href="@{/forum/insertArticle}" style="color: black"><i
+									class="fa-solid fa-pen-to-square fa-lg"></i> 撰寫文章</a></li>
+					</div>
+				</div>
+
+
+
+				<!-- 我的文章區域 -->
+				<div class="col-8 d-grid gap-1 m-3 align-items-stretch">
+
+					<!-- 文章區域  -->
+					<h5 class="p-3 mb-3 border-bottom border-top rounded">我的文章</h5>
+					<th:block th:each="article : ${articles}">
+						<div class="list-group" style="height: 240px;">
+							<div class="list-group-item list-group-item-action position-relative ">
+								<div class="container-fluid d-flex flex-row mb-2 p-0">
+									<i class="fa-solid fa-user"></i> &nbsp
+									<div class="co1" th:text=${article.member.memberName}></div>
+									&nbsp &nbsp <i class="fa-solid fa-calendar-days"></i>&nbsp
+									<div class="col me-auto" th:text=${article.articleDate}></div>
+
+									<div class="btn-group">
+										<button type="button" class="btn btn-light dropdown-toggle"
+											data-bs-toggle="dropdown"></button>
+										<ul class="dropdown-menu">
+											<li>
+												<form method="get" th:action="@{/forum/intoEdit}">
+													<input type="hidden" name="articleId"
+														th:value="${article.articleId}"> <input type="hidden"
+														name="memberNum" th:value="${article.member.memberNum}">
+													<button class="dropdown-item" type="submit">編輯文章</button>
+												</form>
+											</li>
+											<li>
+												<button class="dropdown-item " data-bs-toggle="modal"
+													th:data-bs-target="'#delete'+${article.articleId}"
+													type="button">刪除文章</button>
+											</li>
+										</ul>
+									</div>
+								</div>
+
+								<div class="d-flex" data-bs-toggle="modal"
+									th:data-bs-target="'#articleId'+${article.articleId}">
+
+									<div class="me-auto">
+										<h5 th:text=${article.articleName}></h5>
+										<br>
+										<p
+											th:utext="${#strings.length(article.articleContent) > 40 ? #strings.substring(article.articleContent, 0, 70) + '...' : article.articleContent}">
+										</p>
+									</div>
+									<img class="rounded m-2 end-0" style="width: 160px; height: 160px;" alt="..."
+										th:src="@{'/forum/getImage/'+${article.articleId}}" />
+
+								</div>
+							</div>
+						</div>
+					</th:block>
+
+				</div>
+			</div>
+		</div>
+	</main>
+
+
+
+
+	<!-- 刪除彈出視窗 -->
+	<th:block th:each="article : ${articles}">
+		<div class="modal fade" th:id="'delete'+${article.articleId}" tabindex="-1" aria-labelledby="exampleModalLabel"
+			aria-hidden="true" data-bs-backdrop="static">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">確認刪除？</h5>
+					</div>
+					<div class="modal-body">
+						<p>確定要刪除本篇文章嗎？此操作無法復原。</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+						<form method="get" th:action="@{/forum/deleteArticle}">
+							<input type="hidden" name="articleId" th:value="${article.articleId}">
+							<button type="submit" class="btn btn-danger">確認刪除</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</th:block>
+
+	<!-- 文章彈出窗 -->
+	<th:block th:each="article : ${articles}">
+		<div class="modal fade" th:id="'articleId'+${article.articleId}" data-bs-keyboard="false" tabindex="-1"
+			aria-labelledby="staticBackdropLabel" aria-hidden="true">
+			<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+				<div class="modal-content">
+					<div class=" modal-header">
+						<h1 class="modal-title fs-5" th:text=${'會員編號:'+article.member.memberNum}></h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<div>
+							<h3 th:text=${article.articleName}></h3>
+						</div>
+
+						<div th:text=${'發布時間:'+article.articleDate}></div>
+						<span><a href="#" th:text=${article.articleType}></a>・</span>
+
+						<div class="row">
+							<img class=" img-thumbnail" alt="..." th:src="@{'/forum/getImage/'+${article.articleId}}" />
+						</div>
+						<p th:utext="${article.articleContent}"></p>
+						<div>
+							<i class="fa-regular fa-heart"></i><span>like count</span>
+						</div>
+
+						<hr>
+						<div>共 N 則留言</div>
+
+
+						<!-- 留言區域 -->
+						<hr>
+						<div class="container-fluid d-flex flex-row mb-2 p-0">
+							<div class="co1">#第X樓・</div>
+							<div class="co1">會員編號:001・</div>
+							<div class="co1 me-auto">回覆時間:2023-01-01</div>
+
+							<div class="btn-group">
+								<button type="button" class="btn btn-light dropdown-toggle"
+									data-bs-toggle="dropdown"></button>
+								<ul class="dropdown-menu">
+									<li>
+										<button class="dropdown-item " data-bs-toggle="modal" data-bs-target="#report"
+											type="button">檢舉留言</button>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div>
+							<p>Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+								Rerum accusantium unde quisquam delectus eveniet vitae sequi
+								iusto? Dignissimos, molestiae unde!</p>
+						</div>
+						<div class="col">
+							<i class="fa-regular fa-heart"></i><span>like count</span>
+						</div>
+						<hr>
+
+
+					</div>
+
+
+					<div class="modal-footer p-0">
+						<div class="container">
+							<form action="" method="post" class="row g-1">
+
+								<div class="col">
+									<textarea class="form-control" id="message" rows="1"
+										placeholder="留言...."></textarea>
+
+								</div>
+								<div class="col-auto">
+									<button type="submit" class="btn btn-secondary">send</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</th:block>
+
+	</main>
+
+
+
+	<!-- Footer -->
+	<div style="display: fixed">
+		<div th:replace="~{layout/indexFooter}"></div>
+	</div>
+
+
+	<!-- Script CDN -->
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+		integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+		crossorigin="anonymous"></script>
+
+	<script>
+
+	</script>
+</body>
+
+</html>

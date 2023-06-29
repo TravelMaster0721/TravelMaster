@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+	<!-- 頂部導航欄 -->
+	<div th:replace="~{layout/indexHeader}"></div>
+
+	<div class="container">
+		<div class="row">
+			<div class="col-12">
+				<form method="post" th:action="@{/forum/insertArticle}" enctype="multipart/form-data">
+					<div class="mb-3">
+						<label for="title" class="form-label">文章標題</label> <input
+							type="text" class="form-control" id="title" name="articleName">
+					</div>
+					<div class="mb-3">
+						<label for="articleType" class="form-label">文章類型</label> <select
+							class="form-select form-select-sm mb-3" name="articleType">
+							<option selected>請選擇您的文章分類--</option>
+							<option value="北台灣">北台灣</option>
+							<option value="西台灣">西台灣</option>
+							<option value="南臺灣">南臺灣</option>
+							<option value="東台灣">東台灣</option>
+							<option value="旅遊攻略">旅遊攻略</option>
+							<option value="旅遊注意事項">旅遊注意事項</option>
+						</select>
+					</div>
+					<textarea id="editor" name="articleContent"></textarea>
+					<div class="text-center">
+						<button type="submit" class="btn btn-primary">Submit</button>
+					</div>
+				</form>
+
+			</div>
+
+		</div>
+
+	</div>
+
+
+
+	<div th:replace="~{layout/indexFooter}"></div>
+	<script
+		th:src="@{https://cdn.ckeditor.com/ckeditor5/38.0.1/classic/ckeditor.js}"></script>
+
+	<script>
+    ClassicEditor
+        .create( document.querySelector( '#editor' ) )
+        .catch( error => {
+            console.error( error );
+        } );
+</script>
+
+</body>
+</html>

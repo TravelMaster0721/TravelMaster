@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>TM Login</title>
+</head>
+<body>
+<div th:replace="~{layout/indexHeader}"></div>
+<main>
+		<section class="hero" id="section_1">
+			<div class="container">
+				<div class="row">
+					<div class="video-wrap">
+						<video autoplay="" loop="" muted="" class="custom-video" poster="">
+							<source th:src="@{/video/pagevideo.mp4}" type="video/mp4">
+							Your browser does not support the video tag.
+						</video>
+					</div>
+					<div class="col-lg-5 col-12 m-auto">
+						<div class="hero-text">
+							<div class="card-body p-5 text-center"
+								style="background-color: rgba(255, 255, 255, 0.9);">
+
+								<form action="checklogin.controller" method="post">
+									<h3 class="mb-5">Sign in Now</h3>
+
+									<div class="form-outline mb-4">
+										<input type="text" id="memberacc"
+											class="form-control form-control-lg" name="memberacc"
+											placeholder="帳號" required /> <label class="form-label"
+											for="memberacc"></label>
+									</div>
+
+									<div class="form-outline mb-4">
+										<input type="password" id="memberpwd"
+											class="form-control form-control-lg" name="memberpwd"
+											placeholder="密碼" required /> <label class="form-label"
+											for="memberpwd"></label>
+									</div>
+									<div class="form-outline mb-4" th:if="${errorMessage}">
+							    <p class="text-danger" th:text="${errorMessage}"></p>
+							</div>
+									<!-- Checkbox -->
+									<div class="form-check d-flex justify-content-start mb-4">
+										<label class="form-check-label" for="form1Example3"></label> <i
+											style="margin-left: 29%;"><a href="#"
+											style="color: black">忘記密碼?</a></i> <i style="margin-left: 30px;"><a
+											th:href="@{/registered.controller}" style="color: black">註冊會員</a></i>
+
+									</div>
+
+									<button class="btn btn-primary btn-lg btn-block" type="submit">Login</button>
+
+									<hr class="my-4">
+
+									<button class="btn btn-lg btn-block btn-primary"
+										style="background-color: #dd4b39;" type="submit">
+										<i class="fab fa-google me-2"></i> Sign in with google
+									</button>
+									<button class="btn btn-lg btn-block btn-primary mb-2"
+										style="background-color: #3b5998; margin-top: 8px"
+										type="submit">
+										<i class="fab fa-facebook-f me-2"></i>Sign in with facebook
+									</button>
+								</form>
+								
+								<input id="registerSuccess" type="hidden" th:value="${registerSuccess}">
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+<div th:replace="~{layout/indexFooter}"></div>
+
+<!-- JAVASCRIPT FILES -->
+	<script th:src="@{js/index/jquery.min.js}"></script>
+	<script th:src="@{js/index/bootstrap.min.js}"></script>
+	<script th:src="@{js/index/jquery.sticky.js}"></script>
+	<script th:src="@{js/index/custom.js}"></script>
+	<script th:src="@{https://kit.fontawesome.com/0a9f356c66.js}"
+		th:crossorigin="@{anonymous}"></script>
+   <script th:inline="javascript" th:if="${registerSuccess != null}">
+   	  var registerSuccessValue = document.getElementById("registerSuccess").value;
+   	  console.log(registerSuccess);
+      alert(registerSuccessValue);
+   </script>
+
+</body>
+</html>

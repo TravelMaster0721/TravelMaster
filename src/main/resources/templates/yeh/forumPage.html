@@ -1,0 +1,499 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="">
+	<title>Travel Master</title>
+
+	<style>
+		.sidebar-scrollable {
+			overflow-y: auto;
+			height: 200px;
+		}
+
+		.mainarea-scrollable {
+			overflow-y: auto;
+			height: 600px;
+		}
+	</style>
+</head>
+
+<body>
+
+	<!-- 頂部導航欄 -->
+	<div th:replace="~{layout/indexHeader}"></div>
+
+	<main>
+		<div class="container">
+			<div class="row">
+
+				<!-- sidebar -->
+				<div class="col-3 m-0 p-0">
+
+
+					<div class=" flex-column align-items-stretch p-1 m-3" style="position: fixed;">
+
+						<form class="d-flex mb-1">
+							<input class="form-control me-2" type="search" placeholder="Search">
+							<button class="btn btn-outline-success" type="submit">Search</button>
+						</form>
+
+						<li class="list-group-item list-group-item-action mb-1 rounded" style="border: none;"><a
+								th:href="@{/forum/intoForumPage}" style="color: black"> <i
+									class="fa-solid fa-list fa-lg"></i>
+								論壇
+							</a></li>
+						<div th:if="${member != null}">
+							<li class="list-group-item list-group-item-action mb-1 rounded" style="border: none;"><a
+									th:href="@{/forum/personalPage}" style="color: black"><i
+										class="fa-solid fa-newspaper fa-lg"></i>
+									文章管理</a></li>
+							<li class="list-group-item list-group-item-action mb-1 rounded" style="border: none;"><a
+									th:href="@{/forum/insertArticle}" style="color: black"><i
+										class="fa-solid fa-pen-to-square fa-lg"></i> 撰寫文章</a></li>
+						</div>
+						<input type="hidden" class="memberNum" th:value="${member?.memberNum}">
+
+						<div class="sidebar-scrollable">
+							<li class="list-group-item list-group-item-action mb-1 rounded" style="border: none;"><a
+									href="#" style="color: black"><i class="fa-solid fa-newspaper fa-lg"></i> 旅遊攻略</a>
+							</li>
+						</div>
+					</div>
+				</div>
+
+
+				<!-- 文章區域  -->
+				<div class="col-8 d-grid gap-1 bg-white rounded p-2 m-3 align-items-stretch ">
+
+					<th:block th:each="article : ${articles}">
+						<div class="list-group">
+							<div class="list-group-item list-group-item-action position-relative p-3">
+								<div class="container-fluid d-flex flex-row p-0">
+									<i class="fa-solid fa-user"></i> &nbsp<div class="co1"
+										th:text=${article.member.memberName}></div>&nbsp &nbsp
+									<i class="fa-solid fa-calendar-days"></i>&nbsp<div class="col me-auto"
+										th:text=${''+article.articleDate}></div>
+
+									<div class="btn-group">
+										<button type="button" class="btn btn-light dropdown-toggle"
+											data-bs-toggle="dropdown"></button>
+										<ul class="dropdown-menu">
+											<li>
+												<form method="post" action="">
+													<button class="dropdown-item" type="submit">收藏文章</button>
+												</form>
+											</li>
+											<li>
+												<button class="dropdown-item " data-bs-toggle="modal"
+													th:data-bs-target="'#report'+${article.articleId}"
+													type="button">檢舉文章</button>
+											</li>
+										</ul>
+									</div>
+								</div>
+
+								<div class="postArea d-flex" data-bs-toggle="modal"
+									th:data-bs-target="'#articleId'+${article.articleId}"
+									th:data-post-id="${article.articleId}">
+
+									<div class="me-auto">
+										<h5 th:text=${article.articleName}></h5>
+										<p
+											th:text="${#strings.length(article.articleContent) > 40 ? #strings.substring(article.articleContent, 0, 70) + '...' : article.articleContent}">
+										</p>
+									</div>
+									<img class="rounded m-1 end-0" style="width: 160px; height: 160px;" alt="..."
+										th:src="@{'/forum/getImage/'+${article.articleId}}" />
+								</div>
+							</div>
+						</div>
+					</th:block>
+
+
+
+				</div>
+			</div>
+		</div>
+
+
+
+		<!-- 檢舉彈出視窗 -->
+		<div class="modal fade" id="deleteComment1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"
+			data-bs-backdrop="static">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">是否確認檢舉此文章</h5>
+					</div>
+					<div class="modal-body">請問檢舉原因為何?</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+						<form method="post" action="">
+							<button type="submit" class="btn btn-danger">送出檢舉</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 文章彈出窗 -->
+		<th:block th:each="article : ${articles}">
+			<div class="modal fade" th:id="'articleId'+${article.articleId}" data-bs-keyboard="false" tabindex="-1">
+				<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+					<div class="modal-content">
+						<div class=" modal-header">
+							<h1 class="modal-title fs-5" th:text=${'會員編號:'+article.member.memberNum}></h1>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<div>
+								<h3 th:text=${article.articleName}></h3>
+							</div>
+
+							<div th:text=${'發布時間:'+article.articleDate}></div>
+							<span><a href="#" th:text=${article.articleType}></a>・</span>
+
+							<div class="row">
+								<img class=" img-thumbnail" alt="..."
+									th:src="@{'/forum/getImage/'+${article.articleId}}" />
+							</div>
+							<p th:text=${article.articleContent}></p>
+							<div>
+								<i class="like-btn fa-regular fa-heart"></i>&nbsp<span
+									th:text="${#lists.size(article.likes)}"></span>
+							</div>
+
+							<div class="commentArea"></div>
+						</div>
+						<div class="modal-footer p-0">
+							<div class="container">
+
+								<div class="row g-1">
+									<div class="col">
+										<input type="hidden" name="articleId" th:value="${article.articleId}">
+										<textarea class="form-control" rows="1" placeholder="留言...."></textarea>
+									</div>
+									<div class="col-auto">
+										<button class="insert-comment-btn btn btn-outline-primary">送出</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</th:block>
+
+	</main>
+
+
+	<!-- Footer -->
+	<div th:replace="~{layout/indexFooter}"></div>
+
+	<!-- JS -->
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+		integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+		crossorigin="anonymous"></script>
+	<script th:src="@{/js/yeh/axios.min.js}"></script>
+
+	<script>
+
+
+		/*----------------------------------點擊文章生成留言Ajax---------------------------------------- */
+
+		const findAllCommentByArticleUrl = 'http://localhost:8080/TM/forum/findComment';
+		const postArea = document.querySelectorAll('.postArea');
+
+
+		for (let i = 0; i < postArea.length; i++) {
+			postArea[i].addEventListener('click', (e) => {
+				let articleId = e.currentTarget.getAttribute('data-post-id');
+				let targetModal = document.querySelector('#articleId' + articleId);
+				findComment(articleId, targetModal)
+
+
+			});
+		}
+
+		function findComment(targetArticleId, targetModal) {
+			axios({
+				url: findAllCommentByArticleUrl,
+				method: 'get',
+				params: {
+					articleId: targetArticleId
+				}
+			})
+				.then(response => {
+					console.log(response.data);
+					commentHtmlMaker(response.data, targetModal);
+
+				})
+				.catch(err => {
+				})
+		}
+
+		/*-----------------------------------新增留言Ajax--------------------------------------- */
+
+		const insertCommentUrl = 'http://localhost:8080/TM/forum/insertComment';
+		const commentBtn = document.querySelectorAll('.insert-comment-btn');
+
+		for (let i = 0; i < commentBtn.length; i++) {
+			commentBtn[i].addEventListener('click', (e) => {
+				e.preventDefault();
+				const modal = commentBtn[i].closest('.modal-content');
+				const articleId = modal.querySelector('input[name="articleId"]').value;
+				const comment = modal.querySelector('textarea.form-control').value;
+				let output = modal.querySelector('.commentArea');
+				output.innerHTML = '';
+				insertComment(comment, articleId, modal);
+				modal.querySelector('.form-control').value = '';
+
+			})
+		}
+
+		function insertComment(comment, articleId, targetModal) {
+			axios({
+				url: insertCommentUrl,
+				method: 'post',
+				params: {
+					commentContent: comment,
+					articleId: articleId
+				}
+			})
+				.then(response => {
+					Swal.mixin({
+						toast: true,
+						position: 'bottom',
+						showConfirmButton: false,
+						timer: 2000
+					})
+						.fire({
+							icon: 'success',
+							title: '新增留言成功 !'
+						})
+					commentHtmlMaker(response.data, targetModal);
+				})
+				.catch(err => {
+					Swal.mixin({
+						toast: true,
+						position: 'bottom',
+						showConfirmButton: false,
+						timer: 2000
+					})
+						.fire({
+							icon: 'warning',
+							title: '登入後即可留言 !'
+						})
+					setTimeout(() => {
+						window.location.href = "http://localhost:8080/TM/login.controller";
+					}, 1500);
+
+				});
+		}
+
+		/*--------------------------------------執行刪除 & 修改ajax--------------------------------------------- */
+		const deleteCommentUrl = 'http://localhost:8080/TM/forum/deleteComment';
+		let commentArea = document.querySelectorAll('.commentArea');  // 透過父元素觸發委託事件
+
+		for (let i = 0; i < commentArea.length; i++) {
+			commentArea[i].addEventListener('click', (e) => {
+				switch (true) {
+					case e.target.classList.contains('delete-comment'): {
+						e.preventDefault();
+						let commentId = e.target.getAttribute('data-comment-id');
+						let modal = commentArea[i].closest('.modal-content');
+						let articleId = modal.querySelector('input[name="articleId"]').value;
+						deleteComment(commentId, articleId, modal)
+						break;
+					}
+					case e.target.classList.contains('edit-comment'): {
+						e.preventDefault();
+						let commentId = e.target.getAttribute('data-comment-id');
+						editComment(commentId);
+						break;
+					}
+					default: {
+						break;
+					}
+
+				}
+			});
+		}
+
+		//編輯留言
+		function editComment(msgID) {
+			let content = document.querySelector(`[data-contentid='${msgID}']`)
+			let contentBody = content.parentNode;
+
+			if (contentBody.childNodes.length <= 2) {
+				const saveAndUpdateButton = document.createElement('button');
+				saveAndUpdateButton.className = 'sav-update_btn btn btn-outline-primary btn-sm';
+				saveAndUpdateButton.innerHTML = '送出';
+				insertAfter(content, saveAndUpdateButton)
+				content.setAttribute("contenteditable", "true");
+				content.focus();
+
+				saveAndUpdateButton.addEventListener('click', (e) => {
+					const commentJSONObject = {
+						"commentId": msgID,
+						"commentContent": content.textContent
+					}
+					content.setAttribute("contenteditable", "false");
+					saveAndUpdateButton.remove()
+
+					doEditComment(commentJSONObject)
+				}), { once: true }
+			}
+		}
+
+		function insertAfter(referenceNode, newNode) {
+			referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling)
+		}
+
+		function doEditComment(json) {
+
+			axios.put('http://localhost:8080/TM/forum/editComment', json)
+				.then(res => {
+					Swal.mixin({
+						toast: true,
+						position: 'bottom',
+						showConfirmButton: false,
+						timer: 2000
+					})
+						.fire({
+							icon: 'success',
+							title: '修改留言成功 !'
+						})
+					console.log('res: ' + res)
+
+				})
+				.catch(err => {
+					console.log('err: ' + err)
+				})
+		}
+
+		//刪除留言
+		function deleteComment(targetCommentId, targetArticleId, targetModal) {
+			axios({
+				url: deleteCommentUrl,
+				method: 'post',
+				params: {
+					commentId: targetCommentId,
+					articleId: targetArticleId
+				}
+
+			})
+				.then(response => {
+					Swal.mixin({
+						toast: true,
+						position: 'bottom',
+						showConfirmButton: false,
+						timer: 2000
+					})
+						.fire({
+							icon: 'success',
+							title: '刪除留言成功!'
+						})
+					commentHtmlMaker(response.data, targetModal);
+				})
+				.catch(err => {
+					console.log('err: ' + err);
+				});
+
+
+		}
+
+		/*------------------------------------------按讚ajax----------------------------------------- */
+
+		const likeControlUrl = 'http://localhost:8080/TM/forum/articleLike';
+
+		let likeBtn = document.querySelectorAll('.like-btn');
+		for (let i = 0; i < likeBtn.length; i++) {
+			likeBtn[i].addEventListener('click', (e) => {
+				let modal = likeBtn[i].closest('.modal-content');
+				let memberNum = document.querySelector('.memberNum').value;
+				let articleId = modal.querySelector('input[name="articleId"]').value;
+				console.log(articleId);
+				console.log(memberNum);
+				likeRequest(memberNum, articleId, i)
+			});
+		}
+
+		function likeRequest(targetMemberNum, targetArticleId, index) {
+			axios({
+				url: likeControlUrl,
+				method: 'get',
+				params: {
+					memberNum: targetMemberNum,
+					articleId: targetArticleId
+				}
+			})
+				.then(response => {
+					let likeBtn = document.querySelectorAll('.like-btn');
+					if (response.data === true) {
+						likeBtn[index].classList.remove('fa-regular');
+						likeBtn[index].classList.add('fa-solid');
+						likeBtn[index].style.color = '#e90707';
+					} else {
+						likeBtn[index].classList.remove('fa-solid');
+						likeBtn[index].classList.add('fa-regular');
+						likeBtn[index].style.color = '';
+					}
+
+				})
+				.catch(err => {
+					console.log('err: ' + err);
+				})
+
+		}
+
+
+
+
+
+		/*----------------------------------留言區塊拼接函數--------------------------------------- */
+
+		//留言區塊字串拼接
+		function commentHtmlMaker(CommentArray, target) {
+			let output = target.querySelector('.commentArea');
+			let loginUser = document.querySelector('.memberNum');/* 偵測目前登入的會員是誰 */
+			console.log('登入的使用者是' + loginUser.value);
+
+			if (CommentArray.length !== 0) {
+				let htmlString = '<hr><div>共' + CommentArray.length + ' 則留言</div><hr>';
+				for (let i = 0; i < CommentArray.length; i++) {
+					htmlString += '<div class="container-fluid d-flex flex-row mb-2 p-0">';
+					htmlString += '<div class="co1">#第' + (i + 1) + '樓・</div>';
+					htmlString += '<div class="co1">' + CommentArray[i].memberName + '・</div>';
+					htmlString += '<div class="co1 me-auto">回覆時間:' + CommentArray[i].commentDate + '</div>';
+					htmlString += '<div class="btn-group">';
+					htmlString += '<button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown"></button>';
+					htmlString += '<ul class="dropdown-menu">';
+					htmlString += '<li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#report" type="button">檢舉留言</button></li>';
+					if (loginUser.value === CommentArray[i].memberNum) {
+						htmlString += '<li><button class="dropdown-item delete-comment" data-comment-id="' + CommentArray[i].commentId + '" type="button">刪除留言</button></li>';
+						htmlString += '<li><button class="dropdown-item edit-comment" data-comment-id="' + CommentArray[i].commentId + '" type="button">修改留言</button></li></ul></div></div>';
+					} else {
+						htmlString += '</ul></div></div>';
+					}
+					htmlString += '<div><p data-contentId="' + CommentArray[i].commentId + '">' + CommentArray[i].commentContent + '</p></div>';
+					htmlString += '<div class="col"><i class="fa-regular fa-heart"></i><span>like count</span></div><hr>';
+				}
+				output.innerHTML = htmlString;
+			}
+			else {
+				let htmlString = '<hr><div>尚未有任何留言</div><hr>';
+				output.innerHTML = htmlString;
+			}
+		}
+
+
+	</script>
+
+
+</body>
+
+</html>
