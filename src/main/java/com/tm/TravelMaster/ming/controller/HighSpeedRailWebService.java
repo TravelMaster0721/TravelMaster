@@ -1,6 +1,7 @@
 package com.tm.TravelMaster.ming.controller;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -91,14 +92,26 @@ public class HighSpeedRailWebService {
 	@ResponseBody
 	public String BatchUploadTrainInfo(@RequestParam("file") MultipartFile file) throws IOException {
 		String fileContent = new String(file.getBytes());
-		String[] fileContentList = fileContent.split(System.lineSeparator());
 		boolean uploadResult = true;
 		String resultErrMsg = "";
+		
+//		另一種方法 這樣loop滾一次就夠了
+//		try {
+//			uploadResult = highSpeedRailService.insertTranInfoByCSV(fileContent);
+//		} catch (SQLException e) {
+//			uploadResult = false;
+//			resultErrMsg = e.getMessage();
+//		}
+//		String json = String.format("{\"result\":%s, \"msg\":\"%s\"}", uploadResult ? "true" : "false",
+//				uploadResult ? "批次新增成功" : String.format("批次新增失敗(%s)", resultErrMsg));
+//		System.out.println(json);
+//		return json;
+		
+		String[] fileContentList = fileContent.split(System.lineSeparator());
 		String TranNo, StationID, TrainArrivalTime;
 		TranInfo tInfo;
-		
+		List<TranInfo> tInfos = new ArrayList<>();
 		for (String fileContentRow : fileContentList) {
-			// if 1st row is column need to skip
 			String[] datas = fileContentRow.split(",");
 			// 驗證檔案格式
 			if (datas.length != 3) {
@@ -131,18 +144,21 @@ public class HighSpeedRailWebService {
 			// 2: TrainArrivalTime
 			tInfo = new TranInfo();
 			tInfo.setTranNo(TranNo);
-			tInfo.setStationID(Integer.parseInt(StationID));
+			tInfo.setStationID(StationID);
 			tInfo.setTrainArrvialTime(TrainArrivalTime);
-
-			highSpeedRailService.insertTranInfo(tInfo); 
+			tInfos.add(tInfo);
 		}
-
-//		if (uploadResult) {
-//			//service.commit();
-//		} else {
-//			//service.rollback();
-//		}
-
+		// 所有資料都要對 才可以開始 insert table, 但是這樣會多滾一次loop, 所以可以用另一種寫法 XD 給你參考
+		if(uploadResult) {
+			try {
+				highSpeedRailService.insertTranInfos(tInfos); 
+			} catch (SQLException e) {
+				uploadResult = false;
+				resultErrMsg = e.getMessage();
+			}
+		}
+		
+		
 		String json = String.format("{\"result\":%s, \"msg\":\"%s\"}", uploadResult ? "true" : "false",
 				uploadResult ? "批次新增成功" : String.format("批次新增失敗(%s)", resultErrMsg));
 		System.out.println(json);

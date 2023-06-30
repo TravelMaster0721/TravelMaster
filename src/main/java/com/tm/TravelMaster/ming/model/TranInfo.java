@@ -46,6 +46,10 @@ public class TranInfo {
 		this.stationID = jobj.get("stationID").getAsInt();
 		this.trainArrvialTime = jobj.get("trainArrvialTime").getAsString();
 	}
+	
+	public void setStationID(String stationID) {
+		this.stationID = Integer.parseInt(stationID);
+	}
 
 	@Override
 	public String toString() {

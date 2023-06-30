@@ -138,10 +138,70 @@ public class HighSpeedRailService {
 		return tranInfoRepos.findAll();
 	}
 
+	// 批次新增時刻表
+	@Transactional(rollbackFor = SQLException.class)
+	public void insertTranInfos(List<TranInfo> tInfos) throws SQLException {
+		for (TranInfo tInfo : tInfos) {
+			tranInfoRepos.save(tInfo); // 這裡有出問題就會丟出 SQLException (DB的錯誤)
+		}
+	}
+
+	@Transactional(rollbackFor = SQLException.class)
+	public boolean insertTranInfoByCSV(String tInfo_csv) throws SQLException {
+		boolean uploadResult = true;
+		String resultErrMsg = "", TranNo, StationID, TrainArrivalTime;
+
+		for (String fileContentRow : tInfo_csv.split(System.lineSeparator())) {
+			String[] datas = fileContentRow.split(",");
+			// 驗證檔案格式
+			if (datas.length != 3) {
+				uploadResult = false;
+				resultErrMsg = "檔案格式錯誤";
+				break;
+			}
+
+			TranNo = datas[0].trim(); // 0: TranNo
+			StationID = datas[1].trim(); // 1: StationID
+			TrainArrivalTime = datas[2].trim(); // 2: TrainArrivalTime
+			
+			// 驗證資料格式(excel轉成csv需先以記事本另存檔案轉UTF-8，避免產生髒資料)
+			if (!TranNo.matches("[0-9]+")) {// -> 至少一個數字
+				uploadResult = false;
+				resultErrMsg = "TranNo格式錯誤";
+				break;
+			}
+			if (!StationID.matches("[0-9]+")) { // -> 至少一個數字
+				uploadResult = false;
+				resultErrMsg = "StationID格式錯誤";
+				break;
+			}
+			if (!TrainArrivalTime.matches("[0-9]{1,2}:[0-9]{1,2}")) { // -> 兩個數字 + ":" + 兩個數字
+				uploadResult = false;
+				resultErrMsg = "TrainArrivalTime格式錯誤";
+				break;
+			}
+
+			TranInfo tInfo = new TranInfo();
+			tInfo.setTranNo(TranNo);
+			tInfo.setStationID(StationID);
+			tInfo.setTrainArrvialTime(TrainArrivalTime);
+			try {
+				tranInfoRepos.save(tInfo);
+			} catch (Exception e) {
+				uploadResult = false;
+				resultErrMsg = "DB錯誤";
+				break;
+			}
+		}
+		if (!uploadResult) {
+			throw new SQLException(resultErrMsg);
+		}
+		return uploadResult;
+	}
+
 	// 新增時刻表
-	@Transactional( rollbackFor = SQLException.class)
-	public void insertTranInfo(TranInfo train) {
-		tranInfoRepos.save(train);
+	public void insertTranInfo(TranInfo tInfo) {
+		tranInfoRepos.save(tInfo);
 	}
 
 	// 編輯時刻表
