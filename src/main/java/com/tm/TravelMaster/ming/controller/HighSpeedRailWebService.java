@@ -91,37 +91,61 @@ public class HighSpeedRailWebService {
 	@ResponseBody
 	public String BatchUploadTrainInfo(@RequestParam("file") MultipartFile file) throws IOException {
 		String fileContent = new String(file.getBytes());
-		String[] fileContentList = fileContent.split("\n");
+		String[] fileContentList = fileContent.split(System.lineSeparator());
 		boolean uploadResult = true;
+		String resultErrMsg = "";
+		String TranNo, StationID, TrainArrivalTime;
 		TranInfo tInfo;
-		// service.beginTransaction();
+		
 		for (String fileContentRow : fileContentList) {
 			// if 1st row is column need to skip
 			String[] datas = fileContentRow.split(",");
-			/*
-			 * if(datas format error){ uploadResult = false; break; }
-			 */
+			// 驗證檔案格式
+			if (datas.length != 3) {
+				uploadResult = false;
+				resultErrMsg = "檔案格式錯誤";
+				break;
+			}
+			TranNo = datas[0].trim();
+			StationID = datas[1].trim();
+			TrainArrivalTime = datas[2].trim();
+			// 驗證資料格式(excel轉成csv需先以記事本另存檔案轉UTF-8，避免產生髒資料)
+			if (!TranNo.matches("[0-9]+")) {// -> 至少一個數字
+				uploadResult = false;
+				resultErrMsg = "TranNo格式錯誤";
+				break;
+			}
+			if (!StationID.matches("[0-9]+")) { // -> 至少一個數字
+				uploadResult = false;
+				resultErrMsg = "StationID格式錯誤";
+				break;
+			}
+			if (!TrainArrivalTime.matches("[0-9]{1,2}:[0-9]{1,2}")) { // -> 兩個數字 + ":" + 兩個數字
+				uploadResult = false;
+				resultErrMsg = "TrainArrivalTime格式錯誤";
+				break;
+			}
 
 			// 0: TranNo
 			// 1: StationID
 			// 2: TrainArrivalTime
 			tInfo = new TranInfo();
-			tInfo.setTranNo(datas[0]);
-			tInfo.setStationID(Integer.parseInt(datas[1]));
-			tInfo.setTrainArrvialTime(datas[2]);
-			// service.insert(tInfo);
-		}
-		/**
-		 * if(uploadResult){ 
-		 *   service.commit(); 
-		 * }else{ 
-		 *   service.rollback(); 
-		 * }
-		 */
+			tInfo.setTranNo(TranNo);
+			tInfo.setStationID(Integer.parseInt(StationID));
+			tInfo.setTrainArrvialTime(TrainArrivalTime);
 
-		String json = String.format("{\"result\":%s, \"msg\":%s}", 
-				uploadResult ? "true" : "false",
-				uploadResult ? "批次新增成功" : "批次新增失敗");
+			highSpeedRailService.insertTranInfo(tInfo); 
+		}
+
+//		if (uploadResult) {
+//			//service.commit();
+//		} else {
+//			//service.rollback();
+//		}
+
+		String json = String.format("{\"result\":%s, \"msg\":\"%s\"}", uploadResult ? "true" : "false",
+				uploadResult ? "批次新增成功" : String.format("批次新增失敗(%s)", resultErrMsg));
+		System.out.println(json);
 		return json;
 	}
 }
