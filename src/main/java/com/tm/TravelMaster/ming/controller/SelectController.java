@@ -14,6 +14,7 @@ import com.google.gson.Gson;
 import com.tm.TravelMaster.chih.dao.MemberService;
 import com.tm.TravelMaster.chih.model.Member;
 import com.tm.TravelMaster.ming.db.service.HighSpeedRailService;
+import com.tm.TravelMaster.ming.model.dto.BookingGoForm;
 import com.tm.TravelMaster.ming.model.dto.TrainTimeInfo;
 
 @Controller
@@ -55,7 +56,10 @@ public class SelectController {
 
 	
 	@PostMapping("/bookingGo")
-	public String bookingGo() {
+	public String bookingGo(BookingGoForm bookingGoForm) {
+		
+		System.out.println(bookingGoForm.getFormInputVal_memberId());
+		
 		return "sean/ShoppingCart";
 	}
 }

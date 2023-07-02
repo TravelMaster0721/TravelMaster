@@ -41,51 +41,51 @@
 							<div class="row">
 								<div class="section">
 									<h2 style="text-align: center;">訂票紀錄</h2>
-									<form>
+									<form method="post" th:action="@{/bookingGo}" id="bookingGoForm">
 										<div class="input-group mb-3 p-2">
 											<span class="input-group-text">會員姓名</span><input 
 												type="text" class="form-control" th:value="${session.mbsession.memberName}">
 										</div>
 										<div class="row">
 											<div class="form-floating mb-3 col-6">
+												<label for="DepartureDate">出發日期 :</label>
 												<div class="form-control fs-5" id="DepartureDate"
 													style="text-align: center;"
 													th:text="${trainTimeInfo.getDepartureDate()}"></div>
-												<label for="DepartureDate">出發日期 :</label>
 											</div>
 											<div class="form-floating mb-3 col-6">
+												<label for="TranNo">車次 :</label>
 												<div class="form-control fs-5" id="TranNo"
 													style="text-align: center;"
 													th:text="${trainTimeInfo.getTranNo()}"></div>
-												<label for="TranNo">車次 :</label>
 											</div>
 										</div>
 										<div class="row">
 											<div class="form-floating mb-3 col-6">
+												<label for="DepartureTime">發車時間 :</label>
 												<div class="form-control fs-5" id="DepartureTime"
 													style="text-align: center;"
 													th:text="${trainTimeInfo.getDepartureTime()}"></div>
-												<label for="DepartureTime">發車時間 :</label>
 											</div>
 											<div class="form-floating mb-3 col-6">
+												<label for="ArrivalTime">抵達時間 :</label>
 												<div class="form-control fs-5" id="ArrivalTime"
 													style="text-align: center;"
 													th:text="${trainTimeInfo.getArrivalTime()}"></div>
-												<label for="ArrivalTime">抵達時間 :</label>
 											</div>
 										</div>
 										<div class="row">
 											<div class="form-floating mb-3 col-6">
+												<label for="DepartureStation">出發站 ：</label>
 												<div class="form-control fs-5" id="DepartureStation"
 													style="text-align: center;"
 													th:text="${trainTimeInfo.getDepartureST()}"></div>
-												<label for="DepartureStation">出發站 ：</label>
 											</div>
 											<div class="form-floating mb-3 col-6">
+												<label for="ArrivalStation">抵達站 ：</label>
 												<div class="form-control fs-5" id="ArrivalStation"
 													style="text-align: center;"
 													th:text="${trainTimeInfo.getDestinationST()}"></div>
-												<label for="ArrivalStation">抵達站 ：</label>
 											</div>
 										</div>
 										<div class="mb-3 p-2">
@@ -94,21 +94,31 @@
 										</div>
 										<div class="row">
 											<div class="form-floating mb-3 col-6">
+												<label for="price">每張單價 ：</label>
 												<div class="form-control fs-5" id="price"
 													style="text-align: center;"
 													th:text="${singlePrice} + '&nbsp;元'"></div>
-												<label for="price">每張單價 ：</label>
 											</div>
 											<div class="form-floating mb-3 col-6">
+												<label for="priceTotal">總共票價 ：</label>
 												<div class="form-control fs-5" id="priceTotal"
 													style="text-align: center;">0&nbsp;元</div>
-												<label for="priceTotal">總共票價 ：</label>
 											</div>
 										</div>
 										<div style="text-align: center;">
-											<button type="submit" class="btn btn-dark" th:onclick="bookingGo()">加入購物車</button>
+											<button id="submitForm" class="btn btn-dark" >加入購物車</button>
 											<button type="reset" class="btn btn-dark" th:onclick="cancel()">取消訂票</button>
 										</div>
+										<input type="hidden" id="formInputVal_memberId" name="formInputVal_memberId" th:value="${session.mbsession.memberId}"/>
+										<input type="hidden" id="formInputVal_DepartureDate" name="formInputVal_DepartureDate" th:value="${trainTimeInfo.getDepartureDate()}"/>
+										<input type="hidden" id="formInputVal_TranNo" name="formInputVal_TranNo" th:value="${trainTimeInfo.getTranNo()}"/>
+										<input type="hidden" id="formInputVal_DepartureTime" name="formInputVal_DepartureTime" th:value="${trainTimeInfo.getDepartureTime()}"/>
+										<input type="hidden" id="formInputVal_ArrivalTime" name="formInputVal_ArrivalTime" th:value="${trainTimeInfo.getArrivalTime()}"/>
+										<input type="hidden" id="formInputVal_DepartureStation" name="formInputVal_DepartureStation" th:value="${trainTimeInfo.getDepartureST()}"/>
+										<input type="hidden" id="formInputVal_ArrivalStation" name="formInputVal_ArrivalStation" th:value="${trainTimeInfo.getDestinationST()}"/>
+										<input type="hidden" id="formInputVal_selectedSeats" name="formInputVal_selectedSeats"/>
+										<input type="hidden" id="formInputVal_price" name="formInputVal_price" th:value="${singlePrice}"/>
+										<input type="hidden" id="formInputVal_priceTotal" name="formInputVal_priceTotal"/>
 									</form>
 									<input type="hidden" id="singlePrice" th:value="${singlePrice}">
 								</div>
