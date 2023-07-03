@@ -1,4 +1,4 @@
-package com.tm.TravelMaster.ming.model;
+package com.tm.TravelMaster.ming.model.entity;
 
 import java.io.Serializable;
 import java.util.Objects;

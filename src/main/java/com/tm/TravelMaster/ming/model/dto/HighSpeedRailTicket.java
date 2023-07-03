@@ -3,7 +3,7 @@ package com.tm.TravelMaster.ming.model.dto;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.tm.TravelMaster.ming.model.TicketInfo;
+import com.tm.TravelMaster.ming.model.entity.TicketInfo;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

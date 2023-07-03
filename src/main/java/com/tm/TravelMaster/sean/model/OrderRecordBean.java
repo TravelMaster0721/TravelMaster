@@ -5,7 +5,7 @@ import java.util.Set;
 
 import com.tm.TravelMaster.chih.model.Member;
 import com.tm.TravelMaster.leo.model.Playone;
-import com.tm.TravelMaster.ming.model.TicketInfo;
+import com.tm.TravelMaster.ming.model.entity.TicketInfo;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

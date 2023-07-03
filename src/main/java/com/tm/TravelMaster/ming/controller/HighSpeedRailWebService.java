@@ -1,6 +1,7 @@
 package com.tm.TravelMaster.ming.controller;
 
 import java.io.IOException;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -22,11 +24,11 @@ import org.springframework.web.multipart.MultipartFile;
 import com.google.gson.Gson;
 import com.tm.TravelMaster.ming.db.service.HighSpeedRailService;
 import com.tm.TravelMaster.ming.db.service.TicketInfoService;
-import com.tm.TravelMaster.ming.model.TicketInfo;
-import com.tm.TravelMaster.ming.model.TranInfo;
 import com.tm.TravelMaster.ming.model.dto.BookingGoForm;
 import com.tm.TravelMaster.ming.model.dto.HighSpeedRailTicket;
 import com.tm.TravelMaster.ming.model.dto.TrainTimeInfo;
+import com.tm.TravelMaster.ming.model.entity.TicketInfo;
+import com.tm.TravelMaster.ming.model.entity.TranInfo;
 
 @Controller
 @RequestMapping("/services")
@@ -97,7 +99,7 @@ public class HighSpeedRailWebService {
 		String fileContent = new String(file.getBytes());
 		boolean uploadResult = true;
 		String resultErrMsg = "";
-		
+
 //		另一種方法 這樣loop滾一次就夠了
 //		try {
 //			uploadResult = highSpeedRailService.insertTranInfoByCSV(fileContent);
@@ -109,7 +111,7 @@ public class HighSpeedRailWebService {
 //				uploadResult ? "批次新增成功" : String.format("批次新增失敗(%s)", resultErrMsg));
 //		System.out.println(json);
 //		return json;
-		
+
 		String[] fileContentList = fileContent.split(System.lineSeparator());
 		String TranNo, StationID, TrainArrivalTime;
 		TranInfo tInfo;
@@ -152,53 +154,70 @@ public class HighSpeedRailWebService {
 			tInfos.add(tInfo);
 		}
 		// 所有資料都要對 才可以開始 insert table, 但是這樣會多滾一次loop, 所以可以用另一種寫法 XD 給你參考
-		if(uploadResult) {
+		if (uploadResult) {
 			try {
-				highSpeedRailService.insertTranInfos(tInfos); 
+				highSpeedRailService.insertTranInfos(tInfos);
 			} catch (SQLException e) {
 				uploadResult = false;
 				resultErrMsg = e.getMessage();
 			}
 		}
-		
-		
+
 		String json = String.format("{\"result\":%s, \"msg\":\"%s\"}", uploadResult ? "true" : "false",
 				uploadResult ? "批次新增成功" : String.format("批次新增失敗(%s)", resultErrMsg));
 		System.out.println(json);
 		return json;
 	}
-	
+
 	@PostMapping(value = "/bookingGo", produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public String bookingGo(BookingGoForm bookingGoForm, Model model) {
-		// 改 AJAX後 bookingGoForm 疑似沒抓到資料 晚上在看
-		String[] selectedSeats = bookingGoForm.getFormInputVal_selectedSeats().split(",");
+	public String bookingGo(@RequestBody BookingGoForm bookingGoForm, Model model) {
 		Date today = new Date();
-		String resultErrMsg="";
+		String resultErrMsg = "";
 		boolean result = true;
-		List<TicketInfo> ticketInfos = new ArrayList<>();
-		TicketInfo ticketInfo;
-		for(String selectedSeat: selectedSeats) {
-			ticketInfo = new TicketInfo();
-			ticketInfo.setTranNo(bookingGoForm.getFormInputVal_TranNo());
-			ticketInfo.setSeat(selectedSeat);
-			ticketInfo.setDepartureST(bookingGoForm.getFormInputVal_DepartureStation());
-			ticketInfo.setDestinationST(bookingGoForm.getFormInputVal_ArrivalStation());
-			ticketInfo.setDeparturedate(bookingGoForm.getFormInputVal_DepartureDate());
-			ticketInfo.setDeparturetime(bookingGoForm.getFormInputVal_DepartureTime());
-			ticketInfo.setArrivaltime(bookingGoForm.getFormInputVal_ArrivalTime());
-			ticketInfo.setPrice(Integer.parseInt(bookingGoForm.getFormInputVal_price()));
-			ticketInfo.setBookingdate(today);
-			ticketInfos.add(ticketInfo);
+		if (bookingGoForm.getFormInputVal_selectedSeats() == null
+				|| bookingGoForm.getFormInputVal_selectedSeats().isEmpty()) {
+			result = false;
+			resultErrMsg = "前端資料獲取失敗";
 		}
-		/*
-		 * try { ticketsService.insertTicketInfos(ticketInfos); } catch (SQLException e)
-		 * { resultErrMsg = e.getMessage(); }
-		 */
+
+		if (result) {
+			String[] selectedSeats = bookingGoForm.getFormInputVal_selectedSeats().split(",");
+			List<TicketInfo> ticketInfos = new ArrayList<>();
+			TicketInfo ticketInfo;
+			for (String selectedSeat : selectedSeats) {
+				ticketInfo = new TicketInfo();
+				ticketInfo.setTranNo(bookingGoForm.getFormInputVal_TranNo());
+				ticketInfo.setSeat(selectedSeat);
+				ticketInfo.setDepartureST(bookingGoForm.getFormInputVal_DepartureStation());
+				ticketInfo.setDestinationST(bookingGoForm.getFormInputVal_ArrivalStation());
+				ticketInfo.setDeparturedate(bookingGoForm.getFormInputVal_DepartureDate());
+				ticketInfo.setDeparturetime(bookingGoForm.getFormInputVal_DepartureTime());
+				ticketInfo.setArrivaltime(bookingGoForm.getFormInputVal_ArrivalTime());
+				ticketInfo.setPrice(Integer.parseInt(bookingGoForm.getFormInputVal_price()));
+				ticketInfo.setBookingdate(today);
+				ticketInfos.add(ticketInfo);
+			}
+			// ShoppingCart shoppingCart = new ShoppingCart();
+			// shoppingCart.set....();
+			// shoppingCart.set....();
+			// shoppingCart.set....();
+			// shoppingCart.setTicketInfos(ticketInfos);
+			// try {
+			// insert(shoppingCart);
+			// } catch (SQLException e) {
+			// resultErrMsg = e.getMessage();
+			// }
+			try {
+				ticketsService.insertTicketInfos(ticketInfos);
+			} catch (SQLException e) {
+				resultErrMsg = e.getMessage();
+			}
+		}
 		String json = String.format("{\"result\":%s, \"msg\":\"%s\"}", result ? "true" : "false",
 				result ? "資料儲存成功" : String.format("資料儲存失敗(%s)", resultErrMsg));
 		System.out.println(json);
 		return json;
 	}
-	
+
 }

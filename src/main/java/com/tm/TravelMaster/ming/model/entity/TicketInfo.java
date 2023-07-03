@@ -1,15 +1,18 @@
-package com.tm.TravelMaster.ming.model;
+package com.tm.TravelMaster.ming.model.entity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.tm.TravelMaster.ming.model.dto.HighSpeedRailTicket;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -49,7 +52,7 @@ public class TicketInfo {
 
 	@Column(name = "BookingDate")
 	private String bookingdate;
-
+	
 	public TicketInfo() {
 	}
 

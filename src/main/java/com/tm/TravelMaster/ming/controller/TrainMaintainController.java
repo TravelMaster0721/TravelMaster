@@ -21,8 +21,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.tm.TravelMaster.ming.db.service.HighSpeedRailService;
-import com.tm.TravelMaster.ming.model.StationInfo;
-import com.tm.TravelMaster.ming.model.TranInfo;
+import com.tm.TravelMaster.ming.model.entity.StationInfo;
+import com.tm.TravelMaster.ming.model.entity.TranInfo;
 
 @Controller
 public class TrainMaintainController {

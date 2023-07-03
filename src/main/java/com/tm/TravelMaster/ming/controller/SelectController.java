@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import com.google.gson.Gson;
 import com.tm.TravelMaster.ming.db.service.HighSpeedRailService;
 import com.tm.TravelMaster.ming.db.service.TicketInfoService;
-import com.tm.TravelMaster.ming.model.TicketInfo;
 import com.tm.TravelMaster.ming.model.dto.BookingGoForm;
 import com.tm.TravelMaster.ming.model.dto.TrainTimeInfo;
+import com.tm.TravelMaster.ming.model.entity.TicketInfo;
 
 @Controller
 public class SelectController {

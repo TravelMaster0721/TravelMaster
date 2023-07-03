@@ -22,12 +22,12 @@ import com.tm.TravelMaster.ming.db.repos.PriceInfoRepository;
 import com.tm.TravelMaster.ming.db.repos.StationInfoRepository;
 import com.tm.TravelMaster.ming.db.repos.TrainInfoRepository;
 import com.tm.TravelMaster.ming.db.repos.TrainTimeInfoRepostory;
-import com.tm.TravelMaster.ming.model.PriceInfo;
-import com.tm.TravelMaster.ming.model.StationInfo;
-import com.tm.TravelMaster.ming.model.TicketInfo;
-import com.tm.TravelMaster.ming.model.TranInfo;
 import com.tm.TravelMaster.ming.model.dto.HighSpeedRailTicket;
 import com.tm.TravelMaster.ming.model.dto.TrainTimeInfo;
+import com.tm.TravelMaster.ming.model.entity.PriceInfo;
+import com.tm.TravelMaster.ming.model.entity.StationInfo;
+import com.tm.TravelMaster.ming.model.entity.TicketInfo;
+import com.tm.TravelMaster.ming.model.entity.TranInfo;
 
 @Service
 public class HighSpeedRailService {

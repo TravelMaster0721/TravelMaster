@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.tm.TravelMaster.ming.model.TranInfo;
+import com.tm.TravelMaster.ming.model.entity.TranInfo;
 
 public interface TrainInfoRepository extends JpaRepository<TranInfo, Integer> {
 

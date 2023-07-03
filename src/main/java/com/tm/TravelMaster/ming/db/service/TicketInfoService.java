@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.tm.TravelMaster.ming.db.repos.TicketInfoRepository;
-import com.tm.TravelMaster.ming.model.TicketInfo;
-import com.tm.TravelMaster.ming.model.TranInfo;
+import com.tm.TravelMaster.ming.model.entity.TicketInfo;
+import com.tm.TravelMaster.ming.model.entity.TranInfo;
 
 
 @Service

@@ -1,4 +1,4 @@
-package com.tm.TravelMaster.ming.model;
+package com.tm.TravelMaster.ming.model.entity;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
