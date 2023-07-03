@@ -3,6 +3,7 @@ package com.tm.TravelMaster.ming.controller;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +22,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.google.gson.Gson;
 import com.tm.TravelMaster.ming.db.service.HighSpeedRailService;
 import com.tm.TravelMaster.ming.db.service.TicketInfoService;
+import com.tm.TravelMaster.ming.model.TicketInfo;
 import com.tm.TravelMaster.ming.model.TranInfo;
+import com.tm.TravelMaster.ming.model.dto.BookingGoForm;
 import com.tm.TravelMaster.ming.model.dto.HighSpeedRailTicket;
 import com.tm.TravelMaster.ming.model.dto.TrainTimeInfo;
 
@@ -164,4 +167,38 @@ public class HighSpeedRailWebService {
 		System.out.println(json);
 		return json;
 	}
+	
+	@PostMapping(value = "/bookingGo", produces = "application/json; charset=utf-8")
+	@ResponseBody
+	public String bookingGo(BookingGoForm bookingGoForm, Model model) {
+		// 改 AJAX後 bookingGoForm 疑似沒抓到資料 晚上在看
+		String[] selectedSeats = bookingGoForm.getFormInputVal_selectedSeats().split(",");
+		Date today = new Date();
+		String resultErrMsg="";
+		boolean result = true;
+		List<TicketInfo> ticketInfos = new ArrayList<>();
+		TicketInfo ticketInfo;
+		for(String selectedSeat: selectedSeats) {
+			ticketInfo = new TicketInfo();
+			ticketInfo.setTranNo(bookingGoForm.getFormInputVal_TranNo());
+			ticketInfo.setSeat(selectedSeat);
+			ticketInfo.setDepartureST(bookingGoForm.getFormInputVal_DepartureStation());
+			ticketInfo.setDestinationST(bookingGoForm.getFormInputVal_ArrivalStation());
+			ticketInfo.setDeparturedate(bookingGoForm.getFormInputVal_DepartureDate());
+			ticketInfo.setDeparturetime(bookingGoForm.getFormInputVal_DepartureTime());
+			ticketInfo.setArrivaltime(bookingGoForm.getFormInputVal_ArrivalTime());
+			ticketInfo.setPrice(Integer.parseInt(bookingGoForm.getFormInputVal_price()));
+			ticketInfo.setBookingdate(today);
+			ticketInfos.add(ticketInfo);
+		}
+		/*
+		 * try { ticketsService.insertTicketInfos(ticketInfos); } catch (SQLException e)
+		 * { resultErrMsg = e.getMessage(); }
+		 */
+		String json = String.format("{\"result\":%s, \"msg\":\"%s\"}", result ? "true" : "false",
+				result ? "資料儲存成功" : String.format("資料儲存失敗(%s)", resultErrMsg));
+		System.out.println(json);
+		return json;
+	}
+	
 }

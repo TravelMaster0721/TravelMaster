@@ -1,8 +1,12 @@
 package com.tm.TravelMaster.ming.controller;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.List;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,9 +15,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import com.google.gson.Gson;
-import com.tm.TravelMaster.chih.dao.MemberService;
-import com.tm.TravelMaster.chih.model.Member;
 import com.tm.TravelMaster.ming.db.service.HighSpeedRailService;
+import com.tm.TravelMaster.ming.db.service.TicketInfoService;
+import com.tm.TravelMaster.ming.model.TicketInfo;
 import com.tm.TravelMaster.ming.model.dto.BookingGoForm;
 import com.tm.TravelMaster.ming.model.dto.TrainTimeInfo;
 
@@ -22,6 +26,9 @@ public class SelectController {
 
 	@Autowired
 	private HighSpeedRailService highSpeedRailService;
+	
+	@Autowired
+	private TicketInfoService ticketInfoService;
 	
 	@GetMapping("/select")
 	public String selectPage(Model model) {
@@ -47,19 +54,19 @@ public class SelectController {
 			}
 		}
 
+		model.addAttribute("DepartureST_ID", trainTimeInfo.getDepartureST()); // 這裡還是ID
+		model.addAttribute("DestinationST_ID", trainTimeInfo.getDestinationST());// 這裡還是ID
+		
 		Map<Integer, String> stationMap = highSpeedRailService.getStationInfoMap();
-		trainTimeInfo.setDepartureST(stationMap.get(Integer.parseInt(trainTimeInfo.getDepartureST())));
-		trainTimeInfo.setDestinationST(stationMap.get(Integer.parseInt(trainTimeInfo.getDestinationST())));
+		trainTimeInfo.setDepartureST(stationMap.get(Integer.parseInt(trainTimeInfo.getDepartureST())));// 換成站名了
+		trainTimeInfo.setDestinationST(stationMap.get(Integer.parseInt(trainTimeInfo.getDestinationST())));// 換成站名了
+		
 		model.addAttribute("trainTimeInfo", trainTimeInfo);
 		return "ming/ChoosePage";
 	}
 
-	
-	@PostMapping("/bookingGo")
-	public String bookingGo(BookingGoForm bookingGoForm) {
-		
-		System.out.println(bookingGoForm.getFormInputVal_memberId());
-		
-		return "sean/ShoppingCart";
+	@GetMapping("/bookingRecord")
+	public String BookingRecord() {
+		return "ming/BookingRecord";
 	}
 }

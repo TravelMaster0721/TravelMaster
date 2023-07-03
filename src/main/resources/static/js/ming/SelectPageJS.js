@@ -213,7 +213,13 @@ function placeQueryContent(tranInfos) {
 			booking.appendChild(booking_btn);
 			booking_btn.classList.add("btn");
 			booking_btn.classList.add("btn-secondary");
-			booking_btn.onclick = function() { choose(tranInfo) };
+			
+			if (isMemberLoggedIn()) {
+				booking_btn.onclick = function() { choose(tranInfo) };
+			} else {
+				booking_btn.disabled = true;
+				showSweetAlert();
+			}
 
 			infoRow.appendChild(tranNo);
 			infoRow.appendChild(dep_time);
@@ -226,6 +232,20 @@ function placeQueryContent(tranInfos) {
 	} else {
 		queryContent.innerHTML = '<td colspan="5" class="align-center justify-content-center text-center"><i>無結果</i></td>';
 	}
+}
+
+function showSweetAlert() {
+    Swal.fire({
+        title: '( ｣｡╹o╹｡)｣',
+        text: '登入會員後才可以進行訂票唷 !',
+        icon: 'warning',
+        confirmButtonText: '確定'
+    });
+}
+
+function isMemberLoggedIn(){
+	// 在這裡判斷會員是否已登入，回傳結果（true代表已登入，false代表未登入） [[${session.mbsession.memberName}]]
+	// 未登入應顯示showSweetAlert()
 }
 
 function choose(tranInfo) {

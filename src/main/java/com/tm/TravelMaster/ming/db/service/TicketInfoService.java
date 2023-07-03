@@ -1,5 +1,6 @@
 package com.tm.TravelMaster.ming.db.service;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.tm.TravelMaster.ming.db.repos.TicketInfoRepository;
 import com.tm.TravelMaster.ming.model.TicketInfo;
+import com.tm.TravelMaster.ming.model.TranInfo;
 
 
 @Service
@@ -16,6 +18,13 @@ public class TicketInfoService {
 
 	@Autowired
 	private TicketInfoRepository ticketInfoRepos;
+	
+	@Transactional(rollbackFor = SQLException.class)
+	public void insertTicketInfos( List<TicketInfo> ticketInfos) throws SQLException {
+		for (TicketInfo ticketInfo : ticketInfos) {
+			ticketInfoRepos.save(ticketInfo);
+		}
+	}
 
 	public void insertTicketInfo(TicketInfo ticket) {
 		ticketInfoRepos.save(ticket);

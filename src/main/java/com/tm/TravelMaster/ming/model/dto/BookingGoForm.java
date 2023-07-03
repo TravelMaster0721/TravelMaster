@@ -2,9 +2,6 @@ package com.tm.TravelMaster.ming.model.dto;
 
 public class BookingGoForm {
 	
-	public BookingGoForm() {
-		
-	}
 	private String formInputVal_memberId;
 	private String formInputVal_DepartureDate;
 	private String formInputVal_TranNo;
@@ -16,6 +13,8 @@ public class BookingGoForm {
 	private String formInputVal_price;
 	private String formInputVal_priceTotal;
 	
+	public BookingGoForm() {
+	}
 	public String getFormInputVal_memberId() {
 		return formInputVal_memberId;
 	}

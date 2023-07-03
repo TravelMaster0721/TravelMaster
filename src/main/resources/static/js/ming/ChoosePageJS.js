@@ -76,7 +76,7 @@ function show() {
 	}
 	if (selectedCnt > 0) {
 		p.innerHTML = p_innerHTML; // &nbsp;
-		document.querySelector("#formInputVal_selectedSeats").value = p_innerHTML.replaceAll;
+		document.querySelector("#formInputVal_selectedSeats").value = p_innerHTML;
 	}
 	let priceTotal = document.querySelector("#singlePrice").value * selectedCnt;
 	document.querySelector("#priceTotal").innerHTML = priceTotal + "&nbsp;元";
@@ -117,12 +117,11 @@ $(document).ready(function() {
 		}).then((result) => {
 			if (result.isConfirmed) {
 				Swal.fire(
-					'您的訂票已加入購物車，即將導向購物車頁面',
+					'( ｣｡╹o╹｡)｣您的訂票已加入購物車，即將導向購物車頁面',
 				);
 				setTimeout((() => {
-					alert(123);
 					form.submit();
-				}), 2000);
+				}), 4000);
 
 			} else {
 				return false;
@@ -130,29 +129,3 @@ $(document).ready(function() {
 		});
 	});
 });
-
-/*function bookingGo() {
-	e.preventDefault();
-	var form = $(this).parents('form');
-	Swal.fire({
-		title: '是否加入購物車?',
-		icon: 'warning',
-		showCancelButton: true,
-		confirmButtonColor: '#3085d6',
-		cancelButtonColor: '#d33',
-		confirmButtonText: '確定',
-		cancelButtonText: '繼續訂票'
-	}).then((result) => {
-		if (result.isConfirmed) {
-			Swal.fire(
-				'您的訂票已加入購物車，即將導向購物車頁面',
-			)
-		} else {
-			return false;
-		}
-	})
-	return false;
-}*/
-
-
-
