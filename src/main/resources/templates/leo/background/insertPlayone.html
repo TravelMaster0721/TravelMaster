@@ -13,7 +13,7 @@
 				<div class="st1">
 					<label for="account1" class="t1">旅伴暱稱：</label> <input type="text"
 						class="checknick" id="account1" name="playoneNick"
-						autocomplete="off" size="10" autofocus required maxlength="15">
+						autocomplete="off" size="20" autofocus required maxlength="15">
 				</div>
 				<div id="nickNameStatus"
 					style="display: flex; justify-content: center; align-items: center; margin: 0;"></div>
@@ -24,8 +24,8 @@
 				</div>
 				<div class="st1">
 					<label for="account1" class="t1">旅伴姓名：</label> <input type="text"
-						id="account1" name="playoneName" autocomplete="off" size="10"
-						autofocus required maxlength="15">
+						id="account1" name="playoneName" autocomplete="off" size="20"
+						autofocus required maxlength="20">
 				</div>
 				<div class="st1">
 					<label for="account1" class="t1">旅伴性別：</label> <input type="radio"
@@ -35,20 +35,21 @@
 					</label>
 				</div>
 				<div class="st1">
-					<label for="account1" class="t1">旅伴年齡：</label> <input type="text"
-						id="account1" name="playoneAge" autocomplete="off" size="10"
-						autofocus required maxlength="3">
+					<label for="account1" class="t1">旅伴生日：</label> <input type="text"
+						id="account1" name="playoneBirth" autocomplete="off" size="20"
+						autofocus required placeholder="例如:19960607" maxlength="8">
 				</div>
 				<div class="st1">
-					<label for="account1" class="t1">旅伴興趣：</label> <input type="text"
-						id="account1" name="playoneInterest" autocomplete="off" size="10"
+					<label for="account1" class="t1">一句話：</label> <input type="text"
+						id="account1" name="playoneInterest" autocomplete="off" size="20"
 						autofocus required maxlength="200">
 				</div>
 				<div class="st1">
-					<label for="account1" class="t1">旅伴介紹：</label> <input type="text"
-						id="account1" name="playoneIntroduce" autocomplete="off" size="10"
-						autofocus required maxlength="200">
+					<label for="account1" class="t1">旅伴介紹：</label>
+					<textarea id="account1" name="playoneIntroduce" autocomplete="off"
+						rows="4" style="width: 100%;" required maxlength="200"></textarea>
 				</div>
+
 			</fieldset>
 			<div class="sub">
 				<input type="hidden" id="deletedImages" name="deletedImages">

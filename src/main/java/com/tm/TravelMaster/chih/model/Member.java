@@ -1,26 +1,19 @@
 package com.tm.TravelMaster.chih.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.tm.TravelMaster.leo.model.Playone;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-
-
-import com.tm.TravelMaster.yeh.model.ArticleBean;
-import com.tm.TravelMaster.yeh.model.CommentBean;
-import com.tm.TravelMaster.yeh.model.ArticleLikeBean;
 
 @Entity
 @Table(name = "member")
@@ -32,8 +25,8 @@ public class Member {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int memberSeq;
 
-	@Column(name = "memberNum", unique = true)
-    private String memberNum;
+	@Column(name = "memberNum", insertable = false)
+	private String memberNum;
 
 	@Column(name = "memberName")
 	private String memberName;
@@ -62,20 +55,25 @@ public class Member {
 	@Column(name = "memberLevel", insertable = false)
 	private String memberLevel;
 	
-	@JsonIgnore
-	@JsonManagedReference
-	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-	private List<ArticleBean> articles = new ArrayList<>(0);
+	@Column(name = "memberPhoto")
+	private byte[] memberPhoto;
 
-	@JsonIgnore
-	@JsonManagedReference
-	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-	private List<CommentBean> comments= new ArrayList<>(0);
+	@Column(name = "resetPwdToken")
+	private String resetPwdToken;
+	
+	@Column(name = "playoneLevel",columnDefinition = "int default 0")
+    private int playoneLevel;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(name="auth_provider")
+	private AuthenticationProvider authProvider;
+	
+	@OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
+	private Playone playone;
 
-	@JsonIgnore
-	@JsonManagedReference
-	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-	private List<ArticleLikeBean> likes=new ArrayList<>(0);
+	public Playone getPlayone() { return playone; }
+
+	public void setPlayone(Playone playone) { this.playone = playone; }
 	
 	public Member() {
 	}
@@ -203,32 +201,39 @@ public class Member {
 		this.memberLevel = memberLevel;
 	}
 
-	public List<ArticleBean> getArticles() {
-		return articles;
+	public byte[] getMemberPhoto() {
+		return memberPhoto;
 	}
 
-	public void setArticles(List<ArticleBean> articles) {
-		this.articles = articles;
+	public void setMemberPhoto(byte[] memberPhoto) {
+		this.memberPhoto = memberPhoto;
 	}
 
-	public List<CommentBean> getComments() {
-		return comments;
+	public String getResetPwdToken() {
+		return resetPwdToken;
 	}
 
-	public void setComments(List<CommentBean> comments) {
-		this.comments = comments;
+	public void setResetPwdToken(String resetPwdToken) {
+		this.resetPwdToken = resetPwdToken;
 	}
 
-	public List<ArticleLikeBean> getLikes() {
-		return likes;
+	public int getPlayoneLevel() {
+		return playoneLevel;
 	}
 
-	public void setLikes(List<ArticleLikeBean> likes) {
-		this.likes = likes;
+	public void setPlayoneLevel(int playoneLevel) {
+		this.playoneLevel = playoneLevel;
 	}
+
+	public AuthenticationProvider getAuthProvider() {
+		return authProvider;
+	}
+
+	public void setAuthProvider(AuthenticationProvider authProvider) {
+		this.authProvider = authProvider;
+	}
+
 	
-	
-	
-	
 
+	
 }

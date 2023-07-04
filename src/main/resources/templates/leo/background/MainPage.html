@@ -67,8 +67,7 @@
 </script>
 </head>
 <body>
-	<div th:replace="~{leo/dashboardNavbar}"></div>
-	<div id="layoutSidenav_content">
+	<div th:replace="~{layout/dashboardHeader}"></div>
 		<main>
 			<div class="container-fluid px-4">
 				<div class="button-container" style="margin: 10px;">
@@ -76,15 +75,20 @@
 					<button class="menu all btn btn-primary" id="all-data-btn">全部旅伴資料</button>
 					<button class="menu find btn btn-primary" id="find-data-btn">查詢旅伴資料</button>
 					<button class="menu new btn btn-primary" id="new-data-btn">新增旅伴資料</button>
+					<button class="menu ana btn btn-primary" id="ana-data-btn">分析旅伴資料</button>
+					<form method="get" th:action="@{/playone/audit}"enctype="multipart/form-data">
+					<button type="submit"class="menu reg btn btn-primary" id="reg-data-btn">審核申請資料</button>
+					</form>
+						
 
 
 				</div>
 
-				<div id="container"></div>
+				<div id="container" style="display: flex; justify-content: center; align-items: center;"></div>
 			</div>
 		</main>
 	</div>
-	<div th:replace="~{leo/dashboardFooter}"></div>
+	<div th:replace="~{layout/dashboardFooter}"></div>
 	<script src="https://kit.fontawesome.com/0a9f356c66.js"
 		crossorigin="anonymous"></script>
 	<script
@@ -106,131 +110,180 @@
 	<script
 		src="https://cdn.datatables.net/v/dt/dt-1.13.4/datatables.min.js"></script>
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<script type="text/javascript">
 	
-	//用以再按一下按鈕移除頁面
-   	var pageInserted1 = false;
-   	var pageInserted2 = false;
-   	var pageInserted3 = false;
-	
-	var newBtn = document.getElementById("new-data-btn");
-       newBtn.addEventListener("click", function () {
-       	if (!pageInserted3) {
-           var xhr = new XMLHttpRequest();
-           xhr.open("GET", "/TM/playone/new");
-           xhr.onload = function () {
-               if (xhr.status === 200) {
-                   var newContent = xhr.responseText;
-                   var container = document.getElementById("container");
-                   container.innerHTML = newContent;
-                // 載入腳本
-                   var script = document.createElement('script');
-                   script.src = window.location.origin + "/TM/js/leo/InsertPlayone.js";
-                   document.body.appendChild(script);
-                   
-                   var link = document.createElement("link");
-                   link.rel = "stylesheet";
-                   link.type = "text/css";
-                   link.href = window.location.origin + "/TM/css/leo/InsertPlayone.css";
-                   link.id = "insertplayone-css";
-                   document.head.appendChild(link);
-                   
-                   // Removes all elements with the id 'searchplayone-css'
-                   var oldLinks = document.querySelectorAll("#searchplayone-css");
-                   for (let i = 0; i < oldLinks.length; i++) {
-                       oldLinks[i].parentNode.removeChild(oldLinks[i]);
-                   }
-                   pageInserted1 = false;
-                   pageInserted2 = false;
-                   pageInserted3 = true;
-               }
-           };
-           xhr.send();
-       	} else {
-               var container = document.getElementById("container");
-               container.innerHTML = '';
+	 //用以再按一下按鈕移除頁面
+              var pageInserted1 = false;
+              var pageInserted2 = false;
+              var pageInserted3 = false;
+              var pageInserted4 = false;
 
-               var oldLinks = document.querySelectorAll("#insertplayone-css");
-               for (let i = 0; i < oldLinks.length; i++) {
-                   oldLinks[i].parentNode.removeChild(oldLinks[i]);
-               }
+              var newBtn = document.getElementById("ana-data-btn");
+              newBtn.addEventListener("click", function () {
+                  if (!pageInserted4) {
+                      var xhr = new XMLHttpRequest();
+                      xhr.open("GET", "/TM/playone/Analysis");
+                      xhr.onload = function () {
+                          if (xhr.status === 200) {
+                              var newContent = xhr.responseText;
+                              var container = document.getElementById("container");
+                              container.innerHTML = newContent;
+                              // 載入腳本
+                              var script = document.createElement('script');
+                              script.src = window.location.origin + "/TM/js/leo/analysis.js";
+                              document.body.appendChild(script);
 
-               pageInserted3 = false;
-           }
-       });
-       var newBtn = document.getElementById("find-data-btn");
-       newBtn.addEventListener("click", function () {
-       	if (!pageInserted2) {
-           var xhr = new XMLHttpRequest();
-           xhr.open("GET", "/TM/playone/findone");
-           xhr.onload = function () {
-               if (xhr.status === 200) {
-                   var newContent = xhr.responseText;
-                   var container = document.getElementById("container");
-                   container.innerHTML = newContent;
-                   
-                   var link = document.createElement("link");
-                   link.rel = "stylesheet";
-                   link.type = "text/css";
-                   link.href = window.location.origin + "/TM/css/leo/SearchPlayone.css";
-                   link.id = "searchplayone-css";
-                   document.head.appendChild(link);
-                   
-                   // Removes all elements with the id 'searchplayone-css'
-                   var oldLinks = document.querySelectorAll("#insertplayone-css");
-                   for (let i = 0; i < oldLinks.length; i++) {
-                       oldLinks[i].parentNode.removeChild(oldLinks[i]);
-                   }
-                   pageInserted1 = false;
-                   pageInserted2 = true;
-               	pageInserted3 = false;
-               }
-           };
-           xhr.send();
-       	} else {
-               var container = document.getElementById("container");
-               container.innerHTML = '';
+					var link = document.createElement("link");
+                              link.rel = "stylesheet";
+                              link.type = "text/css";
+                              link.href = window.location.origin + "/TM/css/leo/InsertPlayone.css";
+                              link.id = "insertplayone-css";
+                              document.head.appendChild(link);
+                              
+                              var oldLinks = document.querySelectorAll("#searchplayone-css");
+                              for (let i = 0; i < oldLinks.length; i++) {
+                                  oldLinks[i].parentNode.removeChild(oldLinks[i]);
+                              }
+                              pageInserted1 = false;
+                              pageInserted2 = false;
+                              pageInserted3 = false;
+                              pageInserted4 = true;
+                          }
+                      };
+                      xhr.send();
+                  } else {
+                      var container = document.getElementById("container");
+                      container.innerHTML = '';
 
-               var oldLinks = document.querySelectorAll("#insertplayone-css");
-               for (let i = 0; i < oldLinks.length; i++) {
-                   oldLinks[i].parentNode.removeChild(oldLinks[i]);
-               }
+                      var oldLinks = document.querySelectorAll("#insertplayone-css");
+                      for (let i = 0; i < oldLinks.length; i++) {
+                          oldLinks[i].parentNode.removeChild(oldLinks[i]);
+                      }
 
-               pageInserted2 = false;
-           }
-       });
+                      pageInserted4 = false;
+                  }
+              });
+              
+              var newBtn = document.getElementById("new-data-btn");
+              newBtn.addEventListener("click", function () {
+                  if (!pageInserted3) {
+                      var xhr = new XMLHttpRequest();
+                      xhr.open("GET", "/TM/playone/new");
+                      xhr.onload = function () {
+                          if (xhr.status === 200) {
+                              var newContent = xhr.responseText;
+                              var container = document.getElementById("container");
+                              container.innerHTML = newContent;
+                              // 載入腳本
+                              var script = document.createElement('script');
+                              script.src = window.location.origin + "/TM/js/leo/InsertPlayone.js";
+                              document.body.appendChild(script);
 
-       
-           var allBtn = document.getElementById("all-data-btn");
-           allBtn.addEventListener("click", function () {
-           	if (!pageInserted1) {
-               var xhr = new XMLHttpRequest();
-               xhr.open("GET", "/TM/playone/findall");
-               xhr.onload = function () {
-                   if (xhr.status === 200) {
-                       var newContent = xhr.responseText;
-                       var container = document.getElementById("container");
-                       container.innerHTML = newContent;
-                       pageInserted1 = true;
-                   	pageInserted2 = false;
-                   	pageInserted3 = false;
-                   }
-                   };
-                   xhr.send();
-               }else {
-                       var container = document.getElementById("container");
-                       container.innerHTML = '';
+                              var link = document.createElement("link");
+                              link.rel = "stylesheet";
+                              link.type = "text/css";
+                              link.href = window.location.origin + "/TM/css/leo/InsertPlayone.css";
+                              link.id = "insertplayone-css";
+                              document.head.appendChild(link);
 
-                       var oldLinks = document.querySelectorAll("#insertplayone-css");
-                       for (let i = 0; i < oldLinks.length; i++) {
-                           oldLinks[i].parentNode.removeChild(oldLinks[i]);
-                       }
+                              var oldLinks = document.querySelectorAll("#searchplayone-css");
+                              for (let i = 0; i < oldLinks.length; i++) {
+                                  oldLinks[i].parentNode.removeChild(oldLinks[i]);
+                              }
+                              pageInserted1 = false;
+                              pageInserted2 = false;
+                              pageInserted3 = true;
+                              pageInserted4 = false;
+                          }
+                      };
+                      xhr.send();
+                  } else {
+                      var container = document.getElementById("container");
+                      container.innerHTML = '';
 
-                       pageInserted1 = false;
-                   }
-           });
+                      var oldLinks = document.querySelectorAll("#insertplayone-css");
+                      for (let i = 0; i < oldLinks.length; i++) {
+                          oldLinks[i].parentNode.removeChild(oldLinks[i]);
+                      }
 
+                      pageInserted3 = false;
+                  }
+              });
+
+              var newBtn = document.getElementById("find-data-btn");
+              newBtn.addEventListener("click", function () {
+                  if (!pageInserted2) {
+                      var xhr = new XMLHttpRequest();
+                      xhr.open("GET", "/TM/playone/findone");
+                      xhr.onload = function () {
+                          if (xhr.status === 200) {
+                              var newContent = xhr.responseText;
+                              var container = document.getElementById("container");
+                              container.innerHTML = newContent;
+
+                              var link = document.createElement("link");
+                              link.rel = "stylesheet";
+                              link.type = "text/css";
+                              link.href = window.location.origin + "/TM/css/leo/SearchPlayone.css";
+                              link.id = "searchplayone-css";
+                              document.head.appendChild(link);
+
+                              var oldLinks = document.querySelectorAll("#insertplayone-css");
+                              for (let i = 0; i < oldLinks.length; i++) {
+                                  oldLinks[i].parentNode.removeChild(oldLinks[i]);
+                              }
+                              pageInserted1 = false;
+                              pageInserted2 = true;
+                              pageInserted3 = false;
+                              pageInserted4 = false;
+                          }
+                      };
+                      xhr.send();
+                  } else {
+                      var container = document.getElementById("container");
+                      container.innerHTML = '';
+
+                      var oldLinks = document.querySelectorAll("#insertplayone-css");
+                      for (let i = 0; i < oldLinks.length; i++) {
+                          oldLinks[i].parentNode.removeChild(oldLinks[i]);
+                      }
+
+                      pageInserted2 = false;
+                  }
+              });
+
+
+              var allBtn = document.getElementById("all-data-btn");
+              allBtn.addEventListener("click", function () {
+                  if (!pageInserted1) {
+                      var xhr = new XMLHttpRequest();
+                      xhr.open("GET", "/TM/playone/findall");
+                      xhr.onload = function () {
+                          if (xhr.status === 200) {
+                              var newContent = xhr.responseText;
+                              var container = document.getElementById("container");
+                              container.innerHTML = newContent;
+
+                              pageInserted1 = true;
+                              pageInserted2 = false;
+                              pageInserted3 = false;
+                              pageInserted4 = false;
+                          }
+                      };
+                      xhr.send();
+                  } else {
+                      var container = document.getElementById("container");
+                      container.innerHTML = '';
+
+                      var oldLinks = document.querySelectorAll("#insertplayone-css");
+                      for (let i = 0; i < oldLinks.length; i++) {
+                          oldLinks[i].parentNode.removeChild(oldLinks[i]);
+                      }
+
+                      pageInserted1 = false;
+                  }
+              });
 
 	    
 	</script>

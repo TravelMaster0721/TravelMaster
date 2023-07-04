@@ -4,9 +4,14 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -79,5 +84,19 @@ public class PlayoneImgController {
 
 
 //----------------------------------------其他功能------------------------------------------	
-	
+	// 圖片
+		@GetMapping("/leo/getImageData/{playoneId}")
+		public ResponseEntity<byte[]> getImageData(@PathVariable int playoneId) {
+			// 根據 playoneId 查詢圖片數據
+			List<PlayoneImg> playoneImgList = piService.findImgById(playoneId);
+			if (!playoneImgList.isEmpty()) {
+				PlayoneImg playoneImg = playoneImgList.get(0);
+				byte[] imageData = playoneImg.getPlayonePhoto(); // 假設在 PlayoneImg 類中有名為 getPlayonePhoto() 的方法來獲取圖片數據
+				HttpHeaders headers = new HttpHeaders();
+				headers.setContentType(MediaType.IMAGE_JPEG);
+				return new ResponseEntity<>(imageData, headers, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		}
 }

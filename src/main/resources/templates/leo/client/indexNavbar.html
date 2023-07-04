@@ -29,7 +29,7 @@
 				<span class="navbar-toggler-icon"></span>
 			</button>
 
-			<a th:href="@{/}" class="navbar-brand mx-auto mx-lg-0"> <i
+			<a th:href="@{/playone}" class="navbar-brand mx-auto mx-lg-0"> <i
 				class="fa-solid fa-martini-glass-citrus"></i> <span
 				class="brand-text">TM 旅伴</span>
 			</a>
@@ -38,7 +38,7 @@
 			<div class="collapse navbar-collapse" id="navbarNav">
 				<ul class="navbar-nav ms-auto">
 					<li class="nav-item"><a class="nav-link click-scroll"
-						th:href="@{#section_1}"><i class="fa-solid fa-house"></i></a></li>
+						th:href="@{/layout/index}"><i class="fa-solid fa-house"></i></a></li>
 
 					<li class="nav-item"><a class="nav-link click-scroll"
 						th:href="@{#section_2}">About</a></li>
@@ -48,65 +48,76 @@
 					</li>
 
 					<li class="nav-item"><a class="nav-link click-scroll"
-						th:href="@{#section_4}"><i class="fa-solid fa-calendar-days"></i> 行程</a>
+						th:href="@{/sean/productPageByCount}"><i class="fa-solid fa-calendar-days"></i> 行程</a>
 					</li>
 
 					<li class="nav-item"><a class="nav-link click-scroll"
-						th:href="@{#section_5}"><i class="fa-solid fa-ticket"></i> 訂票</a></li>
+						th:href="@{/select}"><i class="fa-solid fa-ticket"></i> 交通</a></li>
 
 					<li class="nav-item"><a class="nav-link click-scroll"
-						th:href="@{#section_6}"><i class="fa-solid fa-face-smile-wink"></i>
+						th:href="@{/playone}"><i class="fa-solid fa-face-smile-wink"></i>
 							旅伴</a></li>
 
 					<li class="nav-item"><a class="nav-link"
-						th:href="IntoMainPage"><i class="fa-solid fa-comments"></i> 論壇</a></li>
+						th:href="@{/forum/intoForumPage}"><i class="fa-solid fa-comments"></i> 論壇</a></li>
 
 					<li class="nav-item"><a class="nav-link"
-						th:href="CartLoginStatus"><i
+						th:href="@{/sean/CartLoginStatus}"><i
 							class="fa-solid fa-cart-shopping"></i> 購物車</a></li>
 							
-					<li class="nav-item"><a class="nav-link click-scroll"
-						th:href="@{#section_8}"><i class="fa-solid fa-phone"></i> 聯繫</a></li>
+					<li class="nav-item" ><a class="nav-link click-scroll"
+						th:href="@{/playoneRegistered}"><i class="fa-solid fa-phone"></i> 加入我們</a></li>
 						
-		<!--	<%
-			Member mb = (Member) request.getSession().getAttribute("mbsession");
-			if (mb != null) {
-			%> -->
-				<div class="dropdown">
-					<a class="nav-link custom-btn btn d-none d-lg-block" th:href="@{/}" role="button"
-						id="dropdownMenuLink" data-bs-toggle="dropdown"
-						aria-expanded="false"> Hi, <!--  <%=mb.getMemberName()%> --></a>
-	
-					<ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-						<li><a class="dropdown-item" th:href="@{/}">後台管理</a>
-						</li>
-						<li>
-							<hr class="dropdown-divider">
-						</li>
-						<li><a class="dropdown-item"
-							th:href="@{/}">登出</a></li>
-		<!-- 	<%
-			} else {
-			%>  -->
-						<li class="nav-item">
-				            <a class="nav-link custom-btn btn d-none d-lg-block" th:href="@{/}"><i class="fa-solid fa-arrow-right-to-bracket"></i> 登入</a>
-				        </li>
-					</ul>
-				</div>
-		<!-- 	<%
-			}
-			%> -->
+		<li class="nav-item" th:if="${session.mbsession == null}">
+						<a class="nav-link custom-btn btn d-none d-lg-block" th:href="@{/login.controller}">
+							<i class="fa-solid fa-arrow-right-to-bracket"></i> 登入
+						</a>
+					</li>
+
+					<li class="nav-item" th:if="${session.mbsession != null && session.mbsession.memberLevel=='super_user'}">	
+						<div class="dropdown" >
+							  <a class="nav-link custom-btn btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							    Hi,[[${session.mbsession.memberName}]]
+							  </a>
+							
+							  <ul class="dropdown-menu">
+							    <li><a class="dropdown-item" th:href="@{/tobackstage.controller}">後台管理</a></li>
+							    <li><hr class="dropdown-divider" /></li>
+							    <li><a class="dropdown-item" th:href="@{/layout/memberCenter}">會員中心</a></li>
+							    <li><hr class="dropdown-divider" /></li>	
+							    <li><a class="dropdown-item" th:href="@{/logout.controller}">登出</a></li>
+							  </ul>
+						</div>
+					</li>
+					
+					<li class="nav-item" th:if="${session.mbsession != null && session.mbsession.memberLevel=='normal_user'}">	
+						<div class="dropdown" >
+							  <a class="nav-link custom-btn btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							    Hi,[[${session.mbsession.memberName}]]
+							  </a>
+							
+							  <ul class="dropdown-menu">
+							 	<li><a class="dropdown-item" th:href="@{#}">個人資料</a></li>
+							    <li><hr class="dropdown-divider" /></li>
+							 	<li><a class="dropdown-item" th:href="@{/layout/memberCenter}">會員中心</a></li>
+							    <li><hr class="dropdown-divider" /></li>
+							    <li><a class="dropdown-item" th:href="@{/logout.controller}">登出</a></li>
+							  </ul>
+						</div>
+					</li>						
+
 				</ul>
 	</nav>
 	
 <!-- JAVASCRIPT FILES -->
+<script src="https://unpkg.com/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
 <script th:src="@{/js/index/jquery.min.js}"></script>
 <script th:src="@{/js/index/bootstrap.min.js}"></script>
-<script th:src="@{/js/index/jquery.sticky.js}"></script>
 <script th:src="@{/js/index/custom.js}"></script>
 <script src="https://kit.fontawesome.com/0a9f356c66.js" crossorigin="anonymous"></script>
 
 	<script>
+	
 	
 	</script>
 

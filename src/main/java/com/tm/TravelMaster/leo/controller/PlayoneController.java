@@ -21,14 +21,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.stream.Collectors;
 import java.util.zip.ZipOutputStream;
 import java.util.zip.ZipEntry;
 
+import com.tm.TravelMaster.chih.dao.MemberService;
+import com.tm.TravelMaster.chih.model.Member;
 import com.tm.TravelMaster.leo.model.Playone;
 import com.tm.TravelMaster.leo.model.PlayoneImg;
 import com.tm.TravelMaster.leo.service.PlayoneService;
@@ -38,29 +39,13 @@ public class PlayoneController {
 
 	@Autowired
 	private PlayoneService pService;
+	@Autowired
+	private MemberService mService;
 	
 	@GetMapping("/playone/main")
 	public String mainPage() {
 		return "leo/background/MainPage";
 	}
-	
-	@GetMapping("/playone")
-	public String homePage(Model m) {
-		List<Playone> playone = pService.findRandomEightByFixedValue();
-
-	    // Loop through each Playone object and print information about playoneImgs.
-	    for (Playone p : playone) {
-	        if (p.getPlayoneImgs().isEmpty()) {
-	            System.out.println("Playone with ID: " + p.getPlayoneId() + " has no images.");
-	        } else {
-	            System.out.println("Playone with ID: " + p.getPlayoneId() + " has " + p.getPlayoneImgs().size() + " image(s).");
-	        }
-	    }
-
-	    m.addAttribute("playone", playone);
-	    return "leo/client/HomePage";
-	}
-
 	
 
 //----------------------------------------新增功能------------------------------------------	
@@ -72,7 +57,7 @@ public class PlayoneController {
 
 	@PostMapping("/playone/post")
 	protected String PostPlayone(@RequestParam("playoneNick") String pNick, @RequestParam("playoneName") String pName,
-			@RequestParam("playoneSex") String pSex, @RequestParam("playoneAge") String pAge,
+			@RequestParam("playoneSex") String pSex, @RequestParam("playoneBirth") String pBirth,
 			@RequestParam("playoneInterest") String pInterest, @RequestParam("playoneIntroduce") String pIntroduce,
 			@RequestParam(value = "deletedImages", required = false) String deletedImages,
 			@RequestParam("playonePhoto") MultipartFile[] files, Model model) throws IOException {
@@ -120,9 +105,10 @@ public class PlayoneController {
 
 			}
 		}
-		Playone playone = new Playone(pNick, pName, pSex, Integer.parseInt(pAge), pInterest, pIntroduce,
-				playoneImgBeans, 1);
-
+		Member mb = mService.findById(1);
+		System.out.println(mb.getMemberSeq());
+		Playone playone = new Playone(pNick, pName, pSex, Integer.parseInt(pBirth), pInterest, pIntroduce,
+				playoneImgBeans, 0,1,mb);
 		pService.insertPlayone(playone);
 
 		Playone playone1 = pService.findById(playone.getPlayoneId());
@@ -156,6 +142,22 @@ public class PlayoneController {
 	        }
 	    }
 	
+	@GetMapping("/playone/deleteRegisteredAjax")
+	public ResponseEntity<String> deleteRegistered(@RequestParam("playoneId") Integer playoneId) {
+		try {
+			pService.deleteRegisteredById(playoneId);
+			return ResponseEntity.ok("success") ;
+		} catch(NumberFormatException e) {
+			System.out.println("Invalid format for playoneid.");
+			e.printStackTrace();
+			return  ResponseEntity.ok("error") ;
+		} catch(Exception e) {
+			System.out.println("Error in deletion process.");
+			e.printStackTrace();
+			return ResponseEntity.ok("error") ;
+		}
+	}
+	
 //----------------------------------------搜尋功能------------------------------------------	
 	
 	@GetMapping("/playone/findall")
@@ -180,6 +182,13 @@ public class PlayoneController {
 	    m.addAttribute("playone", playone);
 	    return "leo/background/allPlayoneForSearch";
 	}
+	
+	@GetMapping("/playone/audit")
+	public String getPlayoneByRegistered(Model m) {
+		List<Playone> playone = pService.findByRegistered();
+		m.addAttribute("playone", playone);
+		return "leo/background/allRegisteredPlayone";
+	}
 
 	@GetMapping("/playone/findname")
 	public String getPlayonesByName(@RequestParam("name") String playoneName, Model m) {
@@ -187,6 +196,32 @@ public class PlayoneController {
 	    m.addAttribute("playone", playones);
 	    return "leo/background/allPlayone";
 	}
+
+	@GetMapping("/playone/Analysis")
+	public String getPlayoneAnalysis(Model m) {
+	    List<Playone> malePlayones = pService.findBySex("男");
+	    List<Playone> femalePlayones = pService.findBySex("女");
+	    m.addAttribute("maleCount", malePlayones.size());
+	    m.addAttribute("femaleCount", femalePlayones.size());
+
+	    List<Playone> ageGroup1Playones = pService.findByAgeRange(18, 20);
+	    List<Playone> ageGroup2Playones = pService.findByAgeRange(21, 25);
+	    List<Playone> ageGroup3Playones = pService.findByAgeRange(26, 30);
+	    List<Playone> ageGroup4Playones = pService.findByAgeRange(31, 40);
+	    List<Playone> ageGroup5Playones = pService.findByAgeRange(41, 50);
+	    List<Playone> ageGroup6Playones = pService.findByAgeRange(51, Integer.MAX_VALUE);
+	    
+	    m.addAttribute("ageGroup1", ageGroup1Playones.size());
+	    m.addAttribute("ageGroup2", ageGroup2Playones.size());
+	    m.addAttribute("ageGroup3", ageGroup3Playones.size());
+	    m.addAttribute("ageGroup4", ageGroup4Playones.size());
+	    m.addAttribute("ageGroup5", ageGroup5Playones.size());
+	    m.addAttribute("ageGroup6", ageGroup6Playones.size());
+
+	    return "leo/background/sqlAnalysis";
+	}
+
+
 	
 //----------------------------------------修改功能------------------------------------------	
 	
@@ -195,38 +230,51 @@ public class PlayoneController {
 	        @RequestParam("nic") String pNick,
 	        @RequestParam("name") String pName,
 	        @RequestParam("sex") String pSex,
-	        @RequestParam("age") String pAge,
+	        @RequestParam("age") String pBirth,
 	        @RequestParam("ins") String pInterest,
 	        @RequestParam("int") String pIntroduce,
 	        Model m) throws IOException {
 		
 		
-		// 添加日誌輸出，檢查表單欄位的值
 	    Logger logger = LoggerFactory.getLogger(PlayoneController.class);
 	    logger.info("id: " + playoneId);
 	    logger.info("nic: " + pNick);
 	    logger.info("name: " + pName);
 	    logger.info("sex: " + pSex);
-	    logger.info("age: " + pAge);
+	    logger.info("age: " + pBirth);
 	    logger.info("ins: " + pInterest);
 	    logger.info("int: " + pIntroduce);
 		
 		    
-	    // Call the service method to update the Playone
-	    Playone updatedPlayone = pService.updatePlayoneById(playoneId, pNick, pName, pSex, pAge, pInterest, pIntroduce);
+	    Playone updatedPlayone = pService.updatePlayoneById(playoneId, pNick, pName, pSex, pBirth, pInterest, pIntroduce);
 
 	    if (updatedPlayone == null) {
-	        // Handle the case when there is no Playone with the given id
 	        System.out.println("No Playone with id: " + playoneId);
 	        m.addAttribute("message", "No Playone with id: " + playoneId);
 	    } else {
-	        // Add the updated Playone to the model
 	        m.addAttribute("playone", updatedPlayone);
 	    }
 		    
 		List<Playone> playone = pService.findAll();
-		m.addAttribute("playone", playone); // Note: using "playones" instead of "playone" to avoid name collision
+		m.addAttribute("playone", playone); 
 		return "leo/background/allPlayoneForUpdate";
+	}
+	
+	@PutMapping("/playone/ok")
+	public String okPost(@RequestParam("id") String playoneId,
+			Model m) throws IOException {
+		Playone updatedPlayone = pService.updateRegisteredById(playoneId);
+		
+		if (updatedPlayone == null) {
+			System.out.println("No Playone with id: " + playoneId);
+			m.addAttribute("message", "No Playone with id: " + playoneId);
+		} else {
+			m.addAttribute("playone", updatedPlayone);
+		}
+		
+		List<Playone> playone = pService.findByRegistered();
+		m.addAttribute("playone", playone); 
+		return "redirect:/playone/audit";
 	}
 
 
@@ -243,10 +291,6 @@ public class PlayoneController {
         }
     }
 	
-//	@PostMapping
-//	public String handlePostRequest() {
-//		return "redirect:/playone/all";
-//	}
 
 	@GetMapping("/downloadImg/{id}")
 	public ResponseEntity<byte[]> downloadImage(@PathVariable Integer playoneId) {
@@ -277,4 +321,32 @@ public class PlayoneController {
 		return new ResponseEntity<>(baos.toByteArray(), headers, HttpStatus.OK);
 	}
 
+//----------------------------------------CSV功能------------------------------------------		
+	
+	@GetMapping("/playone/all/csv")
+	public ResponseEntity<String> getAllPlayoneCsv() {
+	    List<Playone> playone = pService.findAll();
+	    String csvContent = playone.stream()
+	            .map(this::convertToCsv)
+	            .collect(Collectors.joining(System.lineSeparator()));
+	    HttpHeaders headers = new HttpHeaders();
+	    headers.setContentDispositionFormData("attachment", "playone.csv");
+	    return ResponseEntity.ok()
+	            .headers(headers)
+	            .body(csvContent);
+	}
+
+	private String convertToCsv(Playone playone) {
+	    return playone.getPlayoneId() + ","
+	            + playone.getPlayoneNick() + ","
+	            + playone.getPlayoneName() + ","
+	            + playone.getPlayoneSex() + ","
+	            + playone.getPlayoneBirth() + ","
+	            + playone.getPlayoneInterest() + ","
+	            + playone.getPlayoneIntroduce() + ","
+	            + playone.getFixedValue() + ","
+	            + playone.getRegistered();
+	}
+
+	
 }
