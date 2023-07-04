@@ -8,9 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.tm.TravelMaster.ming.db.repos.ShoppingCartRepository;
 import com.tm.TravelMaster.ming.db.repos.TicketInfoRepository;
+import com.tm.TravelMaster.ming.model.entity.ShoppingCart;
 import com.tm.TravelMaster.ming.model.entity.TicketInfo;
-import com.tm.TravelMaster.ming.model.entity.TranInfo;
 
 
 @Service
@@ -19,8 +20,13 @@ public class TicketInfoService {
 	@Autowired
 	private TicketInfoRepository ticketInfoRepos;
 	
+	@Autowired
+	private ShoppingCartRepository shoppingCartRepos;
+	
+	// TicketInfo CRUD
+	
 	@Transactional(rollbackFor = SQLException.class)
-	public void insertTicketInfos( List<TicketInfo> ticketInfos) throws SQLException {
+	public void insertTicketInfos(List<TicketInfo> ticketInfos) throws SQLException {
 		for (TicketInfo ticketInfo : ticketInfos) {
 			ticketInfoRepos.save(ticketInfo);
 		}
@@ -73,5 +79,23 @@ public class TicketInfoService {
 	    }
 	    return false;
 	}
-
+	
+	// ShoppingCart CRUD
+	@Transactional(rollbackFor = SQLException.class)
+	public ShoppingCart insertShoppingCart(ShoppingCart cart)throws SQLException {
+		return shoppingCartRepos.save(cart);
+	}
+	
+	// 利用ShoppingCart的 cart_Id 找到 TicketInfo 資訊
+	// EX: cart_Id = 1001 ， TicketInfo = [ticketID=11, tranNo=919, seat=01D, ...]
+ 	public ShoppingCart findShoppingCartById(int cart_Id) {
+		Optional<ShoppingCart> optional = shoppingCartRepos.findById(cart_Id);
+		if (optional.isPresent()) {
+			ShoppingCart result = optional.get();
+			result.setTicketInfos(ticketInfoRepos.findByCartIdIs(cart_Id));
+			return result;
+		}
+		return null;
+	}
+	
 }

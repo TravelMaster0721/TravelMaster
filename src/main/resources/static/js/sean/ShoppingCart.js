@@ -1,5 +1,6 @@
 // 購物車動態抓取資訊
-const quantityFields = document.querySelectorAll('.quantity-field');
+const productQuantityFields = document.querySelectorAll('.quantity-field.product-quantity-field');
+const playoneQuantityFields = document.querySelectorAll('.quantity-field.playone-quantity-field');
 const totalAmountElement = document.querySelector('#basket-total');
 const totalItemsElement = document.querySelector('.total-items');
 
@@ -8,10 +9,26 @@ function updateCartTotal() {
 	let totalAmount = 0;
 	let totalItems = 0;
 
-	quantityFields.forEach((quantityField) => {
+	productQuantityFields.forEach((quantityField) => {
+		// 商品的數量處理
 		const quantity = parseInt(quantityField.value);
 		const priceElement = quantityField.parentNode.querySelector('[name="productPrice"]');
 		const price = parseFloat(priceElement.value);
+
+		const subtotal = quantity * price;
+
+		// 更新對應的小計元素
+		const subtotalElement = quantityField.parentNode.parentNode.querySelector('.subtotal');
+		subtotalElement.textContent = subtotal;
+
+		totalAmount += subtotal;
+		totalItems += quantity;
+	});
+
+	playoneQuantityFields.forEach((quantityField) => {
+		// 陪玩的數量處理
+		const quantity = parseInt(quantityField.value);
+		const price = 3000; // 假設陪玩的價格固定為 3000
 
 		const subtotal = quantity * price;
 
@@ -57,7 +74,7 @@ promoCodeInput.addEventListener('blur', function() {
 
 
 //動態修改商品數量(判斷不能大於庫存)-傳後端
-$(".quantity-field").change(function() {
+$(".quantity-field.product").change(function() {
 	console.log($(this).val());
 	let val = parseInt($(this).val());
 	let productId = $(this).closest(".basket-product").find(".productId").val();
@@ -82,3 +99,37 @@ $(".quantity-field").change(function() {
 		console.log("失敗?");
 	}
 });
+
+//購物車為空前往商品頁的按鈕
+function goToProductPage() {
+	window.location.href = 'http://localhost:8080/TM/sean/productPageByCount';
+}
+
+//結帳通知
+function checkout() {
+	// 發起結帳請求
+	$.ajax({
+		url: 'http://localhost:8080/TM/sean/checkOut',
+		type: 'POST',
+		dataType: 'json'
+	})
+		.done(function(response) {
+			if (response.message === 'Checkout completed successfully.') {
+				// 結帳成功
+				Swal.fire({
+					title: 'Success',
+					text: '下單成功!導向結帳頁面:)',
+					icon: 'success'
+				}).then(() => {
+					window.location.href = 'http://localhost:8080/TM/sean/getPersonalOrder';
+				});
+			} else if (response.message === 'Cart is empty.') {
+				Swal.fire('Warning', '購物車空空的喔，去看看行程吧!', 'warning').then(() => {
+					window.location.href = 'http://localhost:8080/TM/sean/productPageByCount';
+				});
+			} else {
+				Swal.fire('Error', 'Unexpected error. Please try again.', 'error');
+			}
+		});
+}
+

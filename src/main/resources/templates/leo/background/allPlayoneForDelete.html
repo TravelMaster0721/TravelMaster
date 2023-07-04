@@ -69,21 +69,71 @@
 </head>
 
 <body>
-	<div th:replace="~{leo/dashboardNavbar}"></div>
-	<div id="layoutSidenav_content">
-		<main>
-			<div class="container-fluid px-4">
-				<div class="button-container" style="margin: 10px;">
-					<button class="menu all btn btn-primary" id="all-data-btn">全部旅伴資料</button>
-					<button class="menu find btn btn-primary" id="find-data-btn">查詢旅伴資料</button>
-					<button class="menu new btn btn-primary" id="new-data-btn">新增旅伴資料</button>
+	<div th:replace="~{layout/dashboardHeader}"></div>
+	<main>
+		<div class="container-fluid px-4">
+			<div class="button-container" style="margin: 10px;">
+				<button class="menu all btn btn-primary" id="all-data-btn">全部旅伴資料</button>
+				<button class="menu find btn btn-primary" id="find-data-btn">查詢旅伴資料</button>
+				<button class="menu new btn btn-primary" id="new-data-btn">新增旅伴資料</button>
+				<button class="menu ana btn btn-primary" id="ana-data-btn">分析旅伴資料</button>
+				<form method="get" th:action="@{/playone/audit}"enctype="multipart/form-data">
+				<button type="submit"class="menu reg btn btn-primary" id="reg-data-btn">審核申請資料</button>
+				</form>
 
-					<script>
+				<script>
                         //用以再按一下按鈕移除頁面
                         var pageInserted1 = false;
                         var pageInserted2 = false;
                         var pageInserted3 = false;
+                        var pageInserted4 = false;
 
+                        var newBtn = document.getElementById("ana-data-btn");
+                        newBtn.addEventListener("click", function () {
+                            if (!pageInserted4) {
+                                var xhr = new XMLHttpRequest();
+                                xhr.open("GET", "/TM/playone/Analysis");
+                                xhr.onload = function () {
+                                    if (xhr.status === 200) {
+                                        var newContent = xhr.responseText;
+                                        var container = document.getElementById("container");
+                                        container.innerHTML = newContent;
+                                        // 載入腳本
+                                        var script = document.createElement('script');
+                                        script.src = window.location.origin + "/TM/js/leo/analysis.js";
+                                        document.body.appendChild(script);
+
+										var link = document.createElement("link");
+                                        link.rel = "stylesheet";
+                                        link.type = "text/css";
+                                        link.href = window.location.origin + "/TM/css/leo/InsertPlayone.css";
+                                        link.id = "insertplayone-css";
+                                        document.head.appendChild(link);
+                                        
+                                        var oldLinks = document.querySelectorAll("#searchplayone-css");
+                                        for (let i = 0; i < oldLinks.length; i++) {
+                                            oldLinks[i].parentNode.removeChild(oldLinks[i]);
+                                        }
+                                        pageInserted1 = false;
+                                        pageInserted2 = false;
+                                        pageInserted3 = false;
+                                        pageInserted4 = true;
+                                    }
+                                };
+                                xhr.send();
+                            } else {
+                                var container = document.getElementById("container");
+                                container.innerHTML = '';
+
+                                var oldLinks = document.querySelectorAll("#insertplayone-css");
+                                for (let i = 0; i < oldLinks.length; i++) {
+                                    oldLinks[i].parentNode.removeChild(oldLinks[i]);
+                                }
+
+                                pageInserted4 = false;
+                            }
+                        });
+                        
                         var newBtn = document.getElementById("new-data-btn");
                         newBtn.addEventListener("click", function () {
                             if (!pageInserted3) {
@@ -106,7 +156,6 @@
                                         link.id = "insertplayone-css";
                                         document.head.appendChild(link);
 
-                                        // Removes all elements with the id 'searchplayone-css'
                                         var oldLinks = document.querySelectorAll("#searchplayone-css");
                                         for (let i = 0; i < oldLinks.length; i++) {
                                             oldLinks[i].parentNode.removeChild(oldLinks[i]);
@@ -114,6 +163,7 @@
                                         pageInserted1 = false;
                                         pageInserted2 = false;
                                         pageInserted3 = true;
+                                        pageInserted4 = false;
                                     }
                                 };
                                 xhr.send();
@@ -148,7 +198,6 @@
                                         link.id = "searchplayone-css";
                                         document.head.appendChild(link);
 
-                                        // Removes all elements with the id 'searchplayone-css'
                                         var oldLinks = document.querySelectorAll("#insertplayone-css");
                                         for (let i = 0; i < oldLinks.length; i++) {
                                             oldLinks[i].parentNode.removeChild(oldLinks[i]);
@@ -156,6 +205,7 @@
                                         pageInserted1 = false;
                                         pageInserted2 = true;
                                         pageInserted3 = false;
+                                        pageInserted4 = false;
                                     }
                                 };
                                 xhr.send();
@@ -187,6 +237,7 @@
                                         pageInserted1 = true;
                                         pageInserted2 = false;
                                         pageInserted3 = false;
+                                        pageInserted4 = false;
                                     }
                                 };
                                 xhr.send();
@@ -208,155 +259,165 @@
 
                     </script>
 
+			</div>
+			<div id="container" style="display: flex; justify-content: center; align-items: center;">
+				<p style="color: red; font-weight: bold; font-size: 24px;">刪除成功!</p>
+			</div>
+			<div class="card mb-4">
+				<div class="card-header">
+					<i class="fas fa-table me-1"></i> 全部旅伴資料表
 				</div>
-				<div id="container" style="text-align: center;">
-					<p style="color: red; font-weight: bold; font-size: 24px;">刪除成功!</p>
-				</div>
-				<div class="card mb-4">
-					<div class="card-header">
-						<i class="fas fa-table me-1"></i> 全部旅伴資料表
-					</div>
-					<div class="card-body">
-						<table id="datatableleo" class="fix">
-							<thead>
-								<tr>
-									<th>編號</th>
-									<th>暱稱</th>
-									<th>照片</th>
-									<th>名稱</th>
-									<th>性別</th>
-									<th>年齡</th>
-									<th>興趣</th>
-									<th>介紹</th>
-									<th id="update">修改</th>
-									<th id="delete">刪除</th>
-								</tr>
-							</thead>
-							<tfoot>
-								<tr>
-									<th>編號</th>
-									<th>暱稱</th>
-									<th>照片</th>
-									<th>名稱</th>
-									<th>性別</th>
-									<th>年齡</th>
-									<th>興趣</th>
-									<th>介紹</th>
-								</tr>
-							</tfoot>
-							<tbody>
-								<th:block th:each="playone:${playone}" th:object="${playone}">
-									<tr class="playoneTr">
-										<td><input type="text" disabled class="id" id="id"
-											name="id" th:value="${playone.playoneId}" style="width: 95%"></td>
-										<td><input type="text" disabled class="nic" id="nic"
-											name="nic" th:value="${playone.playoneNick}"
-											style="width: 95%" autocomplete="off" autofocus required
-											maxlength="15">
-											<div th:id="'nickNameCheck_'+${playone.playoneId}"
-												style="display: flex; justify-content: center; align-items: center; margin: 0;">
-											</div></td>
-										<td>
-											<!-- 建立一個輪播圖元素，id 根據 playone 的 id 來動態產生 -->
-											<div th:id="'carouselExampleIndicators'+${playone.PlayoneId}"
-												class="carousel slide photo-div">
-												<!-- 輸入檔案，用於上傳圖片 -->
-												<form method="post" th:action="@{/playone/imgedit}"
-													enctype="multipart/form-data">
-													<input type="submit" class="photoInput" name="updateimg"
-														th:value="${playone.PlayoneId}" disabled
-														style="display: none;">
-												</form>
-												<!-- 輪播圖指示器 -->
-												<ol class="carousel-indicators">
-													<th:block th:each="img, stat : ${playone.playoneImgs}">
-														<li
-															th:data-target="'#carouselExampleIndicators' + ${playone.playoneId}"
-															th:data-slide-to="${stat.index}"
-															th:class="${stat.first} ? 'active' : ''"></li>
-													</th:block>
-												</ol>
-												<!-- 輪播圖內容 -->
-												<div class="carousel-inner">
-													<th:block th:each="img, stat : ${playone.playoneImgs}">
-														<div class="carousel-item"
-															th:class="${stat.first} ? 'carousel-item active' : 'carousel-item'">
-															<img
-																th:src="'data:image/jpeg;base64,' + ${img.base64Photo}"
-																class="d-block w-100 img" alt="Playone photo"
-																style="height: 130px;">
-														</div>
-														<input type="hidden" class="originalImg" id="originalImg"
-															name="originalImg" th:value="${img.getBase64Photo()}">
-													</th:block>
-												</div>
-												<a class="carousel-control-prev"
-													th:data-target="'#carouselExampleIndicators' + ${playone.playoneId}"
-													role="button" data-slide="prev"> <span
-													class="carousel-control-prev-icon" aria-hidden="true"></span>
-													<span class="visually-hidden">Previous</span>
-												</a> <a class="carousel-control-next"
-													th:data-target="'#carouselExampleIndicators' + ${playone.playoneId}"
-													role="button" data-slide="next"> <span
-													class="carousel-control-next-icon" aria-hidden="true"></span>
-													<span class="visually-hidden">Next</span>
-												</a>
-											</div>
-										</td>
-										<td><input type="text" disabled class="name" id="name"
-											name="name" th:value="${playone.playoneName}"
-											style="width: 95%" required maxlength="15"></td>
-										<td><input type="text" disabled class="sex" id="sex"
-											name="sex" th:value="${playone.playoneSex}"
-											style="width: 95%" required maxlength="3"></td>
-										<td><input type="text" disabled class="age" id="age"
-											name="age" th:value="${playone.playoneAge}"
-											style="width: 95%" required maxlength="3"></td>
-										<td><input type="text" disabled class="ins" id="ins"
-											name="ins" th:value="${playone.playoneInterest}"
-											style="width: 95%" required maxlength="200"></td>
-										<td><input type="text" disabled class="int" id="int"
-											name="int" th:value="${playone.playoneIntroduce}"
-											style="width: 95%" required maxlength="200"></td>
-										<td>
-											<form th:method="put" th:action="@{/playone/edit}"
+				<div class="card-body">
+					<table id="datatableleo" class="fix">
+						<thead>
+							<tr>
+								<th>編號</th>
+								<th>暱稱</th>
+								<th>照片</th>
+								<th>名稱</th>
+								<th>性別</th>
+								<th>生日</th>
+								<th>年齡</th>
+								<th>星座</th>
+								<th>一句話</th>
+								<th>介紹</th>
+								<th id="update">修改</th>
+								<th id="delete">刪除</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<th>編號</th>
+								<th>暱稱</th>
+								<th>照片</th>
+								<th>名稱</th>
+								<th>性別</th>
+								<th>生日</th>
+								<th>年齡</th>
+								<th>星座</th>
+								<th>一句話</th>
+								<th>介紹</th>
+							</tr>
+						</tfoot>
+						<tbody>
+							<th:block th:each="playone:${playone}" th:object="${playone}">
+								<tr class="playoneTr">
+									<td><input type="text" disabled class="id" id="id"
+										name="id" th:value="${playone.playoneId}" style="width: 95%"></td>
+									<td><input type="text" disabled class="nic" id="nic"
+										name="nic" th:value="${playone.playoneNick}"
+										style="width: 95%" autocomplete="off" autofocus required
+										maxlength="15">
+										<div th:id="'nickNameCheck_'+${playone.playoneId}"
+											style="display: flex; justify-content: center; align-items: center; margin: 0;">
+										</div></td>
+									<td>
+										<!-- 建立一個輪播圖元素，id 根據 playone 的 id 來動態產生 -->
+										<div th:id="'carouselExampleIndicators'+${playone.PlayoneId}"
+											class="carousel slide photo-div">
+											<!-- 輸入檔案，用於上傳圖片 -->
+											<form method="post" th:action="@{/playone/imgedit}"
 												enctype="multipart/form-data">
-												<button type="button" class="update updateBtn"
-													id=updateBtn${playone.playoneId}” value="">
-													<i class="fa-solid fa-pen-to-square"></i>
-												</button>
-												<input type="hidden" class="id1" name="id" th:value="${''}">
-												<input type="hidden" class="nic1" name="nic"
-													th:value="${''}"> <input type="hidden"
-													class="name1" name="name" th:value="${''}"> <input
-													type="hidden" class="sex1" name="sex" th:value="${''}">
-												<input type="hidden" class="age1" name="age"
-													th:value="${''}"> <input type="hidden" class="ins1"
-													name="ins" th:value="${''}"> <input type="hidden"
-													class="int1" name="int" th:value="${''}">
-												<button type="submit" class="savedataleo" id="saveBtnleo"
-													value="" style="display: none">
-													<i class="fa-solid fa-check fa-beat"></i>
-												</button>
+												<input type="submit" class="photoInput" name="updateimg"
+													th:value="${playone.PlayoneId}" disabled
+													style="display: none;">
 											</form>
-										</td>
-										<td>
-											<button class="delete"
-												th:id="'deleteButton_' + ${playone.playoneId}"
-												th:data-playone-id="${playone.playoneId}">
-												<i class="fa-solid fa-trash-can"></i>
+											<!-- 輪播圖指示器 -->
+											<ol class="carousel-indicators">
+												<th:block th:each="img, stat : ${playone.playoneImgs}">
+													<li
+														th:data-target="'#carouselExampleIndicators' + ${playone.playoneId}"
+														th:data-slide-to="${stat.index}"
+														th:class="${stat.first} ? 'active' : ''"></li>
+												</th:block>
+											</ol>
+											<!-- 輪播圖內容 -->
+											<div class="carousel-inner">
+												<th:block th:each="img, stat : ${playone.playoneImgs}">
+													<div class="carousel-item"
+														th:class="${stat.first} ? 'carousel-item active' : 'carousel-item'">
+														<img
+															th:src="'data:image/jpeg;base64,' + ${img.base64Photo}"
+															class="d-block w-100 img" alt="Playone photo"
+															style="height: 130px;max-width:130px">
+													</div>
+													<input type="hidden" class="originalImg" id="originalImg"
+														name="originalImg" th:value="${img.getBase64Photo()}">
+												</th:block>
+											</div>
+											<a class="carousel-control-prev"
+												th:data-target="'#carouselExampleIndicators' + ${playone.playoneId}"
+												role="button" data-slide="prev"> <span
+												class="carousel-control-prev-icon" aria-hidden="true"></span>
+												<span class="visually-hidden">Previous</span>
+											</a> <a class="carousel-control-next"
+												th:data-target="'#carouselExampleIndicators' + ${playone.playoneId}"
+												role="button" data-slide="next"> <span
+												class="carousel-control-next-icon" aria-hidden="true"></span>
+												<span class="visually-hidden">Next</span>
+											</a>
+										</div>
+									</td>
+									<td><input type="text" disabled class="name" id="name"
+										name="name" th:value="${playone.playoneName}"
+										style="width: 95%" required maxlength="15"></td>
+									<td><input type="text" disabled class="sex" id="sex"
+										name="sex" th:value="${playone.playoneSex}" style="width: 95%"
+										required maxlength="3"></td>
+									<td><input type="text" disabled class="age" id="age"
+										name="age" th:value="${playone.playoneBirth}" style="width: 95%"
+										required maxlength="8"></td>
+									<td><input type="text" disabled class="age1" id="age1"
+										name="age1" th:value="${playone.age}" style="width: 95%"
+										required maxlength="8"></td>
+									<td><input type="text" disabled class="zodiac" id="zodiac"
+										name="zodiac" th:value="${playone.Zodiac}" style="width: 95%"
+										required maxlength="8"></td>
+									<td><input type="text" disabled class="ins" id="ins"
+										name="ins" th:value="${playone.playoneInterest}"
+										style="width: 95%" required maxlength="200"></td>
+									<td><textarea disabled class="int" id="int" name="int"
+											style="width: 95%; resize: vertical;" required
+											maxlength="200" th:text="${playone.playoneIntroduce}"></textarea>
+									</td>
+									<td>
+										<form th:method="put" th:action="@{/playone/edit}"
+											enctype="multipart/form-data">
+											<button type="button" class="update updateBtn"
+												id=updateBtn${playone.playoneId}” value="">
+												<i class="fa-solid fa-pen-to-square"></i>
 											</button>
-										</td>
-									</tr>
-								</th:block>
-							</tbody>
-						</table>
-					</div>
+											<input type="hidden" class="id1" name="id" th:value="${''}">
+											<input type="hidden" class="nic1" name="nic" th:value="${''}">
+											<input type="hidden" class="name1" name="name"
+												th:value="${''}"> <input type="hidden" class="sex1"
+												name="sex" th:value="${''}"> <input type="hidden"
+												class="age1" name="age" th:value="${''}"> <input
+												type="hidden" class="ins1" name="ins" th:value="${''}">
+											<input type="hidden" class="int1" name="int" th:value="${''}">
+											<button type="submit" class="savedataleo" id="saveBtnleo"
+												value="" style="display: none">
+												<i class="fa-solid fa-check fa-beat"></i>
+											</button>
+										</form>
+									</td>
+									<td>
+										<button class="delete"
+											th:id="'deleteButton_' + ${playone.playoneId}"
+											th:data-playone-id="${playone.playoneId}">
+											<i class="fa-solid fa-trash-can"></i>
+										</button>
+									</td>
+								</tr>
+							</th:block>
+						</tbody>
+					</table>
 				</div>
 			</div>
-		</main>
+		</div>
+	</main>
 	</div>
-	<div th:replace="~{leo/dashboardFooter}"></div>
+	<div th:replace="~{layout/dashboardFooter}"></div>
 	<script src="https://kit.fontawesome.com/0a9f356c66.js"
 		crossorigin="anonymous"></script>
 	<script
@@ -377,6 +438,7 @@
 		src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 	<script
 		src="https://cdn.datatables.net/v/dt/dt-1.13.4/datatables.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<script type="text/javascript">
         function readURL(input, imgElement, originalImgElement) {
             // 當文件選擇框的值發生變化時觸發的函數

@@ -1,9 +1,10 @@
 package com.tm.TravelMaster.leo.model;
 
-
 import java.util.List;
 
 import org.hibernate.annotations.Where;
+
+import com.tm.TravelMaster.chih.model.Member;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -12,8 +13,11 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Data;
 
 @Data
@@ -31,8 +35,8 @@ public class Playone  {
 	private String playoneName;
 	@Column(name = "playoneSex")
 	private String playoneSex;
-	@Column(name = "playoneAge")
-	private int playoneAge;
+	@Column(name = "playoneBirth")
+	private int playoneBirth;
 	@Column(name = "playoneInterest")
 	private String playoneInterest;
 	@Column(name = "playoneIntroduce")
@@ -42,18 +46,30 @@ public class Playone  {
 	private List<PlayoneImg> playoneImgs;
 	@Column(name = "fixedValue")
 	private int fixedValue;
-
+	@Column(name = "registered")
+	private int registered;
+	@OneToOne
+	@JoinColumn(name="memberSeq", referencedColumnName = "memberSeq")
+    private Member member;
+	
+	@Transient
+	private int age;
+	@Transient
+	private String Zodiac;
+	
 	public Playone() {};
 	
-	public Playone(String playoneNick, String playoneName, String playoneSex, int playoneAge,
-			String playoneInterest, String playoneIntroduce, List<PlayoneImg> playoneImgs, int fixedValue) {
+	public Playone(String playoneNick, String playoneName, String playoneSex, int playoneBirth,
+			String playoneInterest, String playoneIntroduce, List<PlayoneImg> playoneImgs, int fixedValue, int registered,Member member) {
 		this.playoneNick = playoneNick;
 		this.playoneName = playoneName;
 		this.playoneSex = playoneSex;
-		this.playoneAge = playoneAge;
+		this.playoneBirth = playoneBirth;
 		this.playoneInterest = playoneInterest;
 		this.playoneIntroduce = playoneIntroduce;
 		this.playoneImgs = playoneImgs;
 		this.fixedValue = fixedValue;
+		this.registered = registered;
+		this.member = member;
 	}
 	}

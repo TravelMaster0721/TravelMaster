@@ -29,6 +29,7 @@ import com.tm.TravelMaster.ming.model.dto.HighSpeedRailTicket;
 import com.tm.TravelMaster.ming.model.dto.TrainTimeInfo;
 import com.tm.TravelMaster.ming.model.entity.TicketInfo;
 import com.tm.TravelMaster.ming.model.entity.TranInfo;
+import com.tm.TravelMaster.ming.model.entity.ShoppingCart;
 
 @Controller
 @RequestMapping("/services")
@@ -180,11 +181,12 @@ public class HighSpeedRailWebService {
 			result = false;
 			resultErrMsg = "前端資料獲取失敗";
 		}
-
+		ShoppingCart shoppingCart = null;
 		if (result) {
 			String[] selectedSeats = bookingGoForm.getFormInputVal_selectedSeats().split(",");
 			List<TicketInfo> ticketInfos = new ArrayList<>();
 			TicketInfo ticketInfo;
+
 			for (String selectedSeat : selectedSeats) {
 				ticketInfo = new TicketInfo();
 				ticketInfo.setTranNo(bookingGoForm.getFormInputVal_TranNo());
@@ -198,24 +200,21 @@ public class HighSpeedRailWebService {
 				ticketInfo.setBookingdate(today);
 				ticketInfos.add(ticketInfo);
 			}
-			// ShoppingCart shoppingCart = new ShoppingCart();
-			// shoppingCart.set....();
-			// shoppingCart.set....();
-			// shoppingCart.set....();
-			// shoppingCart.setTicketInfos(ticketInfos);
-			// try {
-			// insert(shoppingCart);
-			// } catch (SQLException e) {
-			// resultErrMsg = e.getMessage();
-			// }
+			shoppingCart = new ShoppingCart();
+			shoppingCart.setTicketInfos(ticketInfos);
+			shoppingCart.setMember_id(bookingGoForm.getFormInputVal_memberId());
+			shoppingCart.setStatus(0);
 			try {
-				ticketsService.insertTicketInfos(ticketInfos);
+				 // 這裡的目的要是拿到剛剛insert的Cart_Id是多少， 因為你的ID 是讓DB自己去長的
+				shoppingCart = ticketsService.insertShoppingCart(shoppingCart);
 			} catch (SQLException e) {
 				resultErrMsg = e.getMessage();
 			}
 		}
-		String json = String.format("{\"result\":%s, \"msg\":\"%s\"}", result ? "true" : "false",
-				result ? "資料儲存成功" : String.format("資料儲存失敗(%s)", resultErrMsg));
+		String json = String.format("{\"result\":%s, \"msg\":\"%s\", \"ticketCartId\":\"%s\"}",
+				result ? "true" : "false", 
+				result ? "資料儲存成功" : String.format("資料儲存失敗(%s)", resultErrMsg),
+				shoppingCart == null ? "-1" : shoppingCart.getCart_Id()); // 把Cart_Id 丟回AJAX
 		System.out.println(json);
 		return json;
 	}

@@ -1,12 +1,8 @@
 package com.tm.TravelMaster.ming.controller;
 
-import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.List;
-import java.sql.SQLException;
-import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,19 +12,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import com.google.gson.Gson;
 import com.tm.TravelMaster.ming.db.service.HighSpeedRailService;
-import com.tm.TravelMaster.ming.db.service.TicketInfoService;
-import com.tm.TravelMaster.ming.model.dto.BookingGoForm;
 import com.tm.TravelMaster.ming.model.dto.TrainTimeInfo;
-import com.tm.TravelMaster.ming.model.entity.TicketInfo;
 
 @Controller
 public class SelectController {
 
 	@Autowired
 	private HighSpeedRailService highSpeedRailService;
-	
-	@Autowired
-	private TicketInfoService ticketInfoService;
 	
 	@GetMapping("/select")
 	public String selectPage(Model model) {

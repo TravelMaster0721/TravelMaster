@@ -35,7 +35,7 @@ public class RegisteredController {
 			mb.setMemberMail(memberMail);;
 			mb.setMemberPhone(memberPhone);;
 			mb.setMemberAdd(memberAdd);;
-			mb.setMemberId(memberId);;
+			mb.setMemberId(memberId.toUpperCase());;
 			mb.setMemberAcc(memberAcc);;
 			mb.setMemberPwd(memberPwd);;
 			mService.insertMember(mb);

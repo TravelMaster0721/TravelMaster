@@ -109,6 +109,7 @@
 									</div>
 									<div style="text-align: center;">
 										<button id="submitForm" class="btn btn-dark">加入購物車</button>
+										
 										<button type="reset" class="btn btn-dark"
 											th:onclick="cancel()">取消訂票</button>
 									</div>
@@ -290,7 +291,7 @@
 						formData["formInputVal_priceTotal"] = document.querySelector("#formInputVal_priceTotal").value;
 						
 						console.log(formData);
-						fetch("services/bookingGo", {
+						fetch("services/bookingGo", { 
 							method: "POST",
 							 headers: {
 						      'Accept': 'application/json',
@@ -300,15 +301,20 @@
 						}).then(response => response.json())
 							.then(data => {
 								if (data.result) {
+									// 成功的話 Cart_Id 就會在data裡面
+									
+									// 用 GET 的方法 丟到sean/addTicketToCart
+									let uri = `sean/addTicketToCart?ticketCartId=${data.ticketCartId}`;
+									console.log(uri);
 									var timeoutID = window.setTimeout((() =>{
-														location.href = `sean/CartLoginStatus`;
+														location.href = uri;
 														}), 5000);
 									Swal.fire(
 										'( ｣｡╹o╹｡)｣您的訂票已加入購物車，即將導向購物車頁面',
 									).then((result_in) => {
 										if (result_in.isConfirmed) {
 											window.clearTimeout(timeoutID);
-											location.href = `sean/CartLoginStatus`;
+											location.href = uri;
 										}
 									});
 									
@@ -334,7 +340,6 @@
 				});
 			});
 		});
-
 	</script>
 </body>
 

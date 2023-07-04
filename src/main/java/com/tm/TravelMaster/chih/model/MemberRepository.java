@@ -27,5 +27,23 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
     @Query("UPDATE Member SET memberName = :memberName, memberMail = :memberMail, memberPhone = :memberPhone, memberAdd = :memberAdd, memberPwd = :memberPwd, memberLevel = :memberLevel WHERE memberNum = :memberNum")
 	public void updateMemberNum(@Param("memberNum") String memberNum, @Param("memberName") String memberName, @Param("memberMail") String memberMail, @Param("memberPhone") String memberPhone, @Param("memberAdd") String memberAdd, @Param("memberPwd") String memberPwd, @Param("memberLevel") String memberLevel);
 	
+	@Query("FROM Member WHERE memberNum != :myMemberNum AND (memberNum LIKE %:memberNum% OR memberLevel LIKE %:memberLevel%)")
+	public List<Member> findByMemberNumOrMemberLevel(@Param("myMemberNum") String myMemberNum,@Param("memberNum") String memberNum, @Param("memberLevel") String memberLevel);
+	
+	@Modifying
+	@Transactional
+    @Query("UPDATE Member SET memberPhoto = :memberPhoto WHERE memberNum = :memberNum")
+	public void updateMemberPhoto(@Param("memberNum") String memberNum,@Param("memberPhoto") byte[] memberPhoto);
+	
+	@Query("From Member WHERE resetPwdToken = :resetPwdToken")
+	public Member findByResetPwdToken(@Param("resetPwdToken") String resetPwdToken);
+	
+	@Query("From Member WHERE memberMail = :memberMail")
+	public Member findByMemberMail(@Param("memberMail") String memberMail);
+	
+	@Modifying
+	@Transactional
+    @Query("UPDATE Member SET memberPwd = :memberPwd WHERE memberNum = :memberNum")
+	public void updateMemberPwd(@Param("memberNum") String memberNum,@Param("memberPwd") String memberPwd);
 	
 }
