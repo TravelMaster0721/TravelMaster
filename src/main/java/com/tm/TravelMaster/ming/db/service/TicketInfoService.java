@@ -80,6 +80,15 @@ public class TicketInfoService {
 	    return false;
 	}
 	
+	public boolean deleteTicketInfo(TicketInfo ticketInfo) {
+	    if (ticketInfo != null) {
+	        ticketInfoRepos.delete(ticketInfo);
+	        return true;
+	    }
+	    return false;
+	}
+	
+	
 	// ShoppingCart CRUD
 	@Transactional(rollbackFor = SQLException.class)
 	public ShoppingCart insertShoppingCart(ShoppingCart cart)throws SQLException {
@@ -96,6 +105,14 @@ public class TicketInfoService {
 			return result;
 		}
 		return null;
+	}
+ 	
+ 	public boolean deleteShoppingCart(ShoppingCart shoppingCart) {
+	    if (shoppingCart != null) {
+	    	shoppingCartRepos.delete(shoppingCart);
+	        return true;
+	    }
+	    return false;
 	}
 	
 }

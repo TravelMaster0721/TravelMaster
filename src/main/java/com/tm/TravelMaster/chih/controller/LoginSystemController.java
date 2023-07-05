@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.tm.TravelMaster.chih.dao.MemberNotFoundException;
 import com.tm.TravelMaster.chih.dao.MemberService;
 import com.tm.TravelMaster.chih.model.Member;
+import com.tm.TravelMaster.leo.model.Playone;
+import com.tm.TravelMaster.leo.service.PlayoneService;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -29,6 +31,9 @@ public class LoginSystemController {
 	
 	@Autowired
 	private MemberService mService;
+	
+	@Autowired
+	private PlayoneService pService;
 	
 	@Autowired
 	private JavaMailSender mailSender;
@@ -47,11 +52,13 @@ public class LoginSystemController {
 
 	@PostMapping("/checklogin.controller")
 	public String processAction(@RequestParam("memberacc") String memberAcc,
-	        @RequestParam("memberpwd") String memberPwd,HttpSession session, Model m) {
+	    @RequestParam("memberpwd") String memberPwd,HttpSession session, Model m) {
 	    boolean result = mService.checkLogin(memberAcc,memberPwd);
 	    if (result) {
 	        Member mb = mService.returnByMemberAcc(new Member(memberAcc));
 	        session.setAttribute("mbsession", mb);
+	        Playone p = pService.findBySeq(mb.getMemberSeq());
+	        session.setAttribute("playonesession", p);
 
 	        String redirectTo = (String) session.getAttribute("url_prior_login");
 	        if (redirectTo != null) {
@@ -66,6 +73,23 @@ public class LoginSystemController {
 	        m.addAttribute("errorMessage", errorMessage);
 	        return "chih/loginSystem";
 	    }
+	}
+	
+	@PostMapping("/googlechecklogin.controller")
+	public String processAction2(@RequestParam("membermail") String membermail,HttpSession session, Model m) {    
+	        Member mb = mService.findByMemberMail(membermail);
+	        session.setAttribute("mbsession", mb);
+	        Playone p = pService.findBySeq(mb.getMemberSeq());
+	        session.setAttribute("playonesession", p);
+	        String redirectTo = (String) session.getAttribute("url_prior_login");
+	        if (redirectTo != null) {
+	            session.removeAttribute("url_prior_login");
+	            return "redirect:" + redirectTo;
+	        } else {
+	            return "redirect:/layout/index";
+	        }
+
+	    
 	}
 	
 	@GetMapping("/logout.controller")

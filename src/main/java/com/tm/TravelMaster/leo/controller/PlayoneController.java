@@ -197,6 +197,7 @@ public class PlayoneController {
 	    return "leo/background/allPlayone";
 	}
 
+	//資料分析
 	@GetMapping("/playone/Analysis")
 	public String getPlayoneAnalysis(Model m) {
 	    List<Playone> malePlayones = pService.findBySex("男");
@@ -260,6 +261,7 @@ public class PlayoneController {
 		return "leo/background/allPlayoneForUpdate";
 	}
 	
+	//審核旅伴
 	@PutMapping("/playone/ok")
 	public String okPost(@RequestParam("id") String playoneId,
 			Model m) throws IOException {
@@ -269,6 +271,11 @@ public class PlayoneController {
 			System.out.println("No Playone with id: " + playoneId);
 			m.addAttribute("message", "No Playone with id: " + playoneId);
 		} else {
+            Member member = updatedPlayone.getMember();
+
+            member.setPlayoneLevel(1); 
+
+            mService.saveMember(member);
 			m.addAttribute("playone", updatedPlayone);
 		}
 		

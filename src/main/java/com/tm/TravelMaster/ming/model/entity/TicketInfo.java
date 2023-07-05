@@ -62,7 +62,7 @@ public class TicketInfo {
 	private int cartId;
 		
 	@JsonBackReference //不由這邊做對面的 JSON序列化
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
 	@JoinColumn(name = "cart_Id")
 	// 這個是對應的物件 跟Table無關 純粹是告訴Hibernate對應關係 跟著他走
 	private ShoppingCart shoppingCart;

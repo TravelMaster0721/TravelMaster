@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import com.tm.TravelMaster.chih.model.Member;
+
 public interface PlayoneRepository extends JpaRepository<Playone, Integer> {
 
 	public Playone findByPlayoneNick(String playoneNick);
@@ -37,4 +39,7 @@ public interface PlayoneRepository extends JpaRepository<Playone, Integer> {
 	Page<Playone> findByPlayoneSexContainingAndFixedValue(String playoneSex,Integer fixedValue, Pageable pageable);
 	
 	void deleteByPlayoneId(Integer playoneId);
+
+	Playone findByMember(Member member);
+
 }

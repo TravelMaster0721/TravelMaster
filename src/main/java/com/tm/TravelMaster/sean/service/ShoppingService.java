@@ -25,7 +25,7 @@ import java.util.UUID;
 public class ShoppingService {
 
 	// JSON儲存路徑 
-	private static final String CART_DATA_DIRECTORY = "D:\\TravelMaster\\TravelMaster\\src\\data\\cart_data";
+	private static final String CART_DATA_DIRECTORY = "D:\\TravelMaster\\workspace\\TravelMaster\\src\\data\\cart_data";
 
 	// 導入JPA
 	private final OrdersRepository ordersRepository;

@@ -61,7 +61,7 @@ public class ShoppingCart {
 }
 
 enum ShoppingCartStatus {
-	NOT_CHECKED_OUT(0, "未結帳"), CHECKED_OUT(1, "已結帳"), REFUNDED(2, "已退票");
+	NOT_CHECKED_OUT(0, "未結帳"), CHECKED_OUT(1, "已結帳");
 
 	private int id;
 	private String desc;

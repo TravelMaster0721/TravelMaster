@@ -20,6 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.PageImpl;
 
 import com.tm.TravelMaster.chih.model.Member;
+import com.tm.TravelMaster.chih.model.MemberRepository;
 import com.tm.TravelMaster.leo.model.Playone;
 import com.tm.TravelMaster.leo.model.PlayoneImg;
 import com.tm.TravelMaster.leo.model.PlayoneImgRepository;
@@ -36,6 +37,8 @@ public class PlayoneService {
 	@Autowired
 	private PlayoneImgRepository piRepo;
 
+	@Autowired
+	private MemberRepository memberRepository;
 //----------------------------------------新增功能------------------------------------------	
 
 	public Playone insertPlayone(Playone po) {
@@ -197,7 +200,17 @@ public class PlayoneService {
 	    }
 	    return null;
 	}
+	
 
+	public Playone findBySeq(Integer memberSeq) {
+	    Member member = memberRepository.findById(memberSeq).orElse(null);
+	    if (member == null) {
+	    }
+	    Playone playone = pRepo.findByMember(member);
+	    return playone;
+	}
+
+	
 	public List<Playone> findByRegistered() {
 		List<Playone> playones = pRepo.findByRegistered(1);
 		 for (Playone playone : playones) {
