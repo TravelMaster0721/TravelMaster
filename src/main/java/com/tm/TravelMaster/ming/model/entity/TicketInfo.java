@@ -27,7 +27,7 @@ public class TicketInfo {
 	@Id
 	@Column(name = "TicketID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@JsonIgnore //這個屬性不做序列化
+//	@JsonIgnore //這個屬性不做序列化 是不是要拿掉? "看起來是"
 	private int ticketID;
 
 	@Column(name = "TranNo")

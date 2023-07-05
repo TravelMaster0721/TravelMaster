@@ -1,12 +1,12 @@
 main {
-  position: absolute;
-  top: 50%;
-  right: 0;
-  left: 0;
-  width: 319px;
-  display: table;
-  margin: 0 auto;
-  transform: translateY(-50%);
+	transform: translateY(50%);
+	transform: translateX(20%);
+	display: flex;
+	/* 水平置中 */
+	justify-content: center;
+	/* 垂直置中 */
+	align-items: center;
+	z-index: 10000;
 }
 
 main a {
@@ -14,7 +14,7 @@ main a {
   width: 33.333%;
   display: table-cell;
   text-align: center;
-  color: #949494;
+  color: #949494; 
   text-decoration: none;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   font-weight: bold;
@@ -75,13 +75,13 @@ main a:nth-child(3):after {
   bottom: 0;
   width: 30px;
   height: 3px;
-  background-color: #fff;
+  background-color: #fff; 
   border-radius: 5px;
   transition: 0.2s ease left;
 }
 
 main a:hover {
-  color: #fff;
+   color: #636f85; 
 }
 
 main a:hover:before,
@@ -101,4 +101,65 @@ main a:nth-child(2):hover ~ #indicator {
 main a:nth-child(3):hover ~ #indicator {
   left: 70%;
   background: linear-gradient(130deg, purple, palevioletred);
+} 
+
+.VYJdTQ {
+	width: 800px;
+	margin-bottom: 12px;
+	display: flex;
+	overflow: hidden;
+	position: -webkit-sticky;
+	position: sticky;
+	top: 0;
+	z-index: 10000;
+	background: #fff;
+	border-top-left-radius: 2px;
+	border-top-right-radius: 2px;
 }
+
+.OFl2GI {
+	cursor: pointer;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	padding: 16px 0;
+	font-size: 16px;
+	line-height: 19px;
+	text-align: center;
+	color: rgba(0, 0, 0, .8);
+	background: #fff;
+	border-bottom: 2px solid rgba(0, 0, 0, .09);
+	display: flex;
+	flex: 1;
+	overflow: hidden;
+	align-items: center;
+	justify-content: center;
+	transition: color .2s;
+}
+
+.hgQK {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.article{
+	transform: translateX(-120%);
+	display: flex;
+ 	justify-content: center;    
+  	align-items: center;     
+}
+ 
+.aside {
+	height: 500px;
+	width: 500px;
+	border: 2px solid rgb(215, 211, 211);
+	border-radius: 30px;
+	box-shadow: 3px 3px 3px gray;
+}
+
+.section {
+	padding: 40px 40px 5px 40px;
+	line-height: 2em;
+}  

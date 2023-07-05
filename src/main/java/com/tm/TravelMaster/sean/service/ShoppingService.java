@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tm.TravelMaster.chih.model.Member;
 import com.tm.TravelMaster.leo.model.Playone;
+import com.tm.TravelMaster.ming.model.entity.ShoppingCart;
 import com.tm.TravelMaster.sean.model.OrdersBean;
 import com.tm.TravelMaster.sean.model.OrderItemsBean;
 import com.tm.TravelMaster.sean.model.ProductBean;
@@ -23,8 +24,8 @@ import java.util.UUID;
 @Transactional
 public class ShoppingService {
 
-	// JSON儲存路徑
-	private static final String CART_DATA_DIRECTORY = "C:\\TravelMaster\\workspace\\TravelMaster\\src\\data\\cart_data";
+	// JSON儲存路徑 
+	private static final String CART_DATA_DIRECTORY = "D:\\TravelMaster\\TravelMaster\\src\\data\\cart_data";
 
 	// 導入JPA
 	private final OrdersRepository ordersRepository;
@@ -69,6 +70,23 @@ public class ShoppingService {
 		return cart;
 	}
 
+	// 訂票-載入購物車JSON
+	public List<ShoppingCart> loadTicketCartData(String memberNum) {
+		List<ShoppingCart> cart = new ArrayList<>();
+		ObjectMapper objectMapper = new ObjectMapper();
+
+		try {
+			File file = new File(CART_DATA_DIRECTORY + File.separator + memberNum + "_Ticket.json");
+			if (file.exists()) {
+				cart = objectMapper.readValue(file, new TypeReference<List<ShoppingCart>>() {
+				});
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return cart;
+	}
+
 	// 行程-儲存購物車JSON資訊至本地端
 	public void saveCartData(String memberNum, List<ProductBean> cart) {
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -92,6 +110,17 @@ public class ShoppingService {
 		}
 	}
 
+	// 訂票-儲存購物車JSON資訊至本地端
+	public void saveTicketCartData(String memberNum, List<ShoppingCart> cart) {
+		ObjectMapper objectMapper = new ObjectMapper();
+		File file = new File(CART_DATA_DIRECTORY + File.separator + memberNum + "_Ticket.json");
+		try {
+			objectMapper.writeValue(file, cart);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	// 行程-重複行程判斷
 	public boolean isProductInCart(List<ProductBean> cart, Integer integer) {
 		for (ProductBean item : cart) {
@@ -105,6 +134,16 @@ public class ShoppingService {
 	// 旅伴-重複旅伴判斷
 	public boolean isPlayoneInCart(List<Playone> cart, int playoneId) {
 		return cart.stream().anyMatch(playone -> playone.getPlayoneId() == playoneId);
+	}
+
+	// 訂票-重複訂票判斷
+	public boolean isCartExists(List<ShoppingCart> carts, int cartId) {
+		for (ShoppingCart cart : carts) {
+			if (cart.getCart_Id() == cartId) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	// 行程-更新JSON商品數量

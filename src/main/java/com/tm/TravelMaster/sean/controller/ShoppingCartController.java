@@ -47,7 +47,7 @@ public class ShoppingCartController {
 	private TicketInfoService ticketsService;
 	@Autowired
 	private HighSpeedRailService highSpeedRailService;
-	
+
 	private final ShoppingService shoppingService;
 	private final LinePayService linePayService;
 
@@ -67,10 +67,12 @@ public class ShoppingCartController {
 			// 加載購物車資訊
 			List<ProductBean> productCart = shoppingService.loadProductCartData(memberNum);
 			List<Playone> playoneCart = shoppingService.loadPlayoneCartData(memberNum);
+			List<ShoppingCart> ShoppingCart = shoppingService.loadTicketCartData(memberNum);
 
 			// 將購物車資料添加到 Model 中
 			model.addAttribute("products", productCart);
 			model.addAttribute("playones", playoneCart);
+			model.addAttribute("tickets", ShoppingCart);
 
 			return "sean/ShoppingCart";
 		} else {
@@ -140,36 +142,39 @@ public class ShoppingCartController {
 			return new ResponseEntity<>("已成功加入商品", HttpStatus.OK);
 		}
 	}
-	
+
 	// 訂票-加入購物車
-	@GetMapping(value = "/sean/addTicketToCart" )
+	@GetMapping(value = "/sean/addTicketToCart")
 	@ResponseBody
-	public String addaddTicketToCart(@RequestParam("ticketCartId") int ticketCartId) {  
-		// 用 GET 的方法 拿到剛剛丟過來的 cart_id 然後 把相關物件拉出來
-		ShoppingCart shoppingCart = ticketsService.findShoppingCartById(ticketCartId);
-		// shoppingCart 就包含所有需要的資訊
-		/*
-		 * 1. 訂票編號 -> shoppingCart.getTicketInfos() => <TicketInfo>.getTicketID();
-		 * 2. 出發站/抵達站 (要中文站名)  -> DepartureST_Name/DestinationST_Name
-		 * 3. 票價 v  -> shoppingCart.getTicketInfos() => <TicketInfo>.getPrice();
-		 * 4. 座位(張數) v ->  shoppingCart.getTicketInfos() => <TicketInfo>.getSeat();
-		 * 5. 出發時間 v ->  shoppingCart.getTicketInfos() => <TicketInfo>.getDepartureTime();
-		 */
-		TicketInfo firstTicketInfo = shoppingCart.getTicketInfos().get(0);
-		
-		Map<Integer, String> stationMap = highSpeedRailService.getStationInfoMap();
-		String DepartureST_Name = stationMap.get(Integer.parseInt(firstTicketInfo.getDepartureST()));
-		String DestinationST_Name = stationMap.get(Integer.parseInt(firstTicketInfo.getDestinationST()));
-		// 印出來給你看
-		System.out.println(shoppingCart.getTicketInfos()); //訂票所有資訊
-		System.out.println(firstTicketInfo.getTicketID()); //訂票編號
-		System.out.println(DepartureST_Name); 	//出發站(中文)
-		System.out.println(DestinationST_Name);	//抵達站(中文)
-		System.out.println(firstTicketInfo.getPrice()); //票價
-		System.out.println(firstTicketInfo.getSeat()); 	//座位
-		System.out.println(firstTicketInfo.getDeparturetime()); //出發時間 
-		
-		return "";
+	public ResponseEntity<String> addaddTicketToCart(@RequestParam("ticketCartId") int ticketCartId,
+			HttpSession session) {
+
+		Member member = (Member) session.getAttribute("mbsession");
+		if (member == null) {
+			return new ResponseEntity<>("請先登入", HttpStatus.UNAUTHORIZED);
+		}
+
+		String memberNum = member.getMemberNum();
+
+		ShoppingCart lastShoppingCart = ticketsService.findShoppingCartById(ticketCartId); // 最新一筆購物車紀錄
+		System.out.println("lastShoppingCart在這: " + lastShoppingCart);
+		Map<Integer, String> stationMap = highSpeedRailService.getStationInfoMap(); // 站 ID-名稱 對應表
+		List<TicketInfo> ticketInfos = lastShoppingCart.getTicketInfos(); // 全部的票
+		System.out.println("ticketInfos在這: " + ticketInfos);
+		for (TicketInfo ticketInfo : ticketInfos) {
+			ticketInfo.setDepartureST(stationMap.get(Integer.parseInt(ticketInfo.getDepartureST())));
+			ticketInfo.setDestinationST(stationMap.get(Integer.parseInt(ticketInfo.getDestinationST())));
+		}
+		// 加載購物車資訊
+		List<ShoppingCart> currentCarts = shoppingService.loadTicketCartData(memberNum);
+		if (shoppingService.isCartExists(currentCarts, lastShoppingCart.getCart_Id())) {
+			return new ResponseEntity<>("訂票已存在於購物車中", HttpStatus.OK);
+		} else {
+			// 添加訂票到購物車
+			currentCarts.add(lastShoppingCart);
+		}
+		shoppingService.saveTicketCartData(memberNum, currentCarts);
+		return new ResponseEntity<>("已成功加入訂票", HttpStatus.OK);
 	}
 
 	// 行程-更新報名人數
@@ -222,7 +227,7 @@ public class ShoppingCartController {
 
 	// 旅伴-刪除購物車旅伴
 	@PostMapping("/sean/RemoveCartPlayoneItem")
-	public String removeCartItem(@RequestParam("playoneId") int playoneId, HttpSession session) {
+	public String removeCartPlayoneItem(@RequestParam("playoneId") int playoneId, HttpSession session) {
 		try {
 			Member member = (Member) session.getAttribute("mbsession");
 			String memberNum = member != null ? member.getMemberNum() : "";
@@ -240,6 +245,38 @@ public class ShoppingCartController {
 				}
 
 				shoppingService.savePlayoneCartData(memberNum, cart);
+			}
+
+			return "redirect:/sean/CartLoginStatus";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "redirect:/sean/CartLoginStatus?error=發生錯誤";
+		}
+	}
+
+	// 訂票-刪除購物車旅伴
+	@PostMapping("/sean/RemoveCartTicketItem")
+	public String removeCartTicketItem(@RequestParam("ticketId") int ticketId, HttpSession session) {
+		try {
+			Member member = (Member) session.getAttribute("mbsession");
+			String memberNum = member != null ? member.getMemberNum() : "";
+			
+			List<ShoppingCart> cart = shoppingService.loadTicketCartData(memberNum);
+			
+			// 加載購物車資訊
+			if (cart != null) {
+				Iterator<ShoppingCart> iterator = cart.iterator();
+				while (iterator.hasNext()) {
+					ShoppingCart item = iterator.next();
+					List<TicketInfo> tickets = item.getTicketInfos();
+					for (TicketInfo ticket : tickets) {
+						if (ticket.getTicketID() == ticketId) {
+							tickets.remove(ticket);
+							break;
+						}
+					}
+				}
+				shoppingService.saveTicketCartData(memberNum, cart);
 			}
 
 			return "redirect:/sean/CartLoginStatus";

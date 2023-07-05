@@ -40,7 +40,7 @@
 								<div th:class="${'product-' + product.productId} +' '+'basket-product'" th:data-productId="${product.productId}">
 									<div class="item">
 										<div class="product-image">
-											<img th:src="@{'/sean/getImage/' + ${product.productId}}" th:alt="${product.productName}"/>
+										<img style="border-radius: 10px; width: 130px; height: 100px; object-fit: cover;" th:src="@{'/sean/getImage/' + ${product.productId}}" th:alt="${product.productName}" />
 										</div>
 										<div class="product-details">
 											<h1 style="font-size: 20px">
@@ -79,7 +79,7 @@
 						            <div class="item">
 						                <div class="product-image">
 						                    <!-- 陪玩項目的圖片 -->
-						                    <img th:src="@{'/leo/getImageData/' + ${playone.playoneId}}" th:alt="${imageAlt}" />
+						                    <img style="border-radius:10px; width: 130px; height: 100px; object-fit: cover;" th:src="@{'/leo/getImageData/' + ${playone.playoneId}}" th:alt="${imageAlt}" />
 						                </div>
 						                <div class="product-details">
 						                   <h1 style="font-size: 20px">
@@ -109,6 +109,47 @@
 						            </div>
 						        </div>
 						    </form>
+						</th:block>
+						<!-- 訂票  -->
+						<th:block th:each="cart : ${tickets}">
+						    <th:block th:each="ticket : ${cart.ticketInfos}">
+						        <form method="post" th:action="@{/sean/RemoveCartTicketItem}">
+						            <div th:class="${'product-' + cart.cart_Id} +' '+'basket-product'" th:data-productId="${cart.cart_Id}">
+						                <div class="item">
+						                    <div class="product-image">
+						                        <!-- 高鐵圖片 -->
+						                        <img style="border-radius: 10px; width: 130px; height: 100px; object-fit: cover;" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Taiwan_High_Speed_Rail_symbol.svg/2048px-Taiwan_High_Speed_Rail_symbol.svg.png" alt="${imageAlt}" />
+						                    </div>
+						                    <div class="product-details">
+						                       <h1 style="font-size: 20px">
+						                            <strong th:text="${ticket.departureST} + ' - '"></strong>
+						                            <strong th:text="${ticket.destinationST}"></strong>
+						                        </h1>
+						                        <p>
+						                            出發時間:
+						                            <span th:text="${ticket.departuretime}"></span>
+						                        </p>
+						                        <p>
+						                            <span th:text="${'班次: ' + ticket.tranNo}"></span>
+						                            &nbsp;
+						                            <span th:text="${'座位: ' + ticket.seat}"></span>
+						                        </p>
+						                    </div>
+						                </div>
+						                <div class="price" th:text="${ticket.price}"></div>
+						                <div>
+						                    <input type="number" name="ticketRegistrations" th:value="1" min="1" class="quantity-field ticket-quantity-field"
+						                        th:data-price="3000" />
+						                    <input type="hidden" name="ticketId" th:value="${ticket.ticketID}" class="ticketId" />
+						                    <input type="hidden" name="ticketPrice" th:value="${ticket.price}" />
+						                </div>
+						                <div class="subtotal subtotal1" th:text="${ticket.price}"></div>
+						                <div class="remove">
+						                    <button type="submit"><i class="fa-solid fa-trash-can"></i> delete</button>
+						                </div>
+						            </div>
+						        </form>
+						    </th:block>
 						</th:block>
 						
 						<!-- 當購物車為空時顯示的提示訊息 -->
