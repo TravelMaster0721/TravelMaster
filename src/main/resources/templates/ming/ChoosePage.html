@@ -266,80 +266,83 @@
 		}
 
 		$(document).ready(function () {
-			$('#submitForm').on('click', function (e) {
-				e.preventDefault();
-				Swal.fire({
-					title: '是否加入購物車?',
-					icon: 'warning',
-					showCancelButton: true,
-					confirmButtonColor: '#3085d6',
-					cancelButtonColor: '#d33',
-					confirmButtonText: '確定',
-					cancelButtonText: '繼續訂票'
-				}).then((result) => {
-					if (result.isConfirmed) {
-						let formData = {};
-						formData["formInputVal_memberId"] = document.querySelector("#formInputVal_memberId").value;
-						formData["formInputVal_DepartureDate"] = document.querySelector("#formInputVal_DepartureDate").value;
-						formData["formInputVal_TranNo"] = document.querySelector("#formInputVal_TranNo").value;
-						formData["formInputVal_DepartureTime"] = document.querySelector("#formInputVal_DepartureTime").value;
-						formData["formInputVal_ArrivalTime"] = document.querySelector("#formInputVal_ArrivalTime").value;
-						formData["formInputVal_DepartureStation"] = document.querySelector("#formInputVal_DepartureStation").value;
-						formData["formInputVal_ArrivalStation"] = document.querySelector("#formInputVal_ArrivalStation").value;
-						formData["formInputVal_selectedSeats"] = document.querySelector("#formInputVal_selectedSeats").value;
-						formData["formInputVal_price"] = document.querySelector("#formInputVal_price").value;
-						formData["formInputVal_priceTotal"] = document.querySelector("#formInputVal_priceTotal").value;
-						
-						console.log(formData);
-						fetch("services/bookingGo", { 
-							method: "POST",
-							 headers: {
-						      'Accept': 'application/json',
-						      'Content-type': 'application/json',
-						    },
-							body: JSON.stringify(formData)
-						}).then(response => response.json())
-							.then(data => {
-								if (data.result) {
-									// 成功的話 Cart_Id 就會在data裡面
-									
-									// 用 GET 的方法 丟到sean/addTicketToCart
-									let uri = `sean/addTicketToCart?ticketCartId=${data.ticketCartId}`;
-									console.log(uri);
-									var timeoutID = window.setTimeout((() =>{
-														location.href = uri;
-														}), 5000);
-									Swal.fire(
-										'( ｣｡╹o╹｡)｣您的訂票已加入購物車，即將導向購物車頁面',
-									).then((result_in) => {
-										if (result_in.isConfirmed) {
-											window.clearTimeout(timeoutID);
-											location.href = uri;
-										}
-									});
-									
-								} else {
-									Swal.fire(
-										"資料儲存失敗",
-										data.msg,
-										"error"
-									);
-								}
-							})
-							.catch(error => {
-								console.error("Error:", error);
-								Swal.fire(
-									"資料儲存失敗",
-									data.msg,
-									"error"
-								);
-							});
-					} else {
-						return false;
-					}
-				});
-			});
-		});
+    $('#submitForm').on('click', function (e) {
+        e.preventDefault();
+        Swal.fire({
+            title: '是否加入購物車?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '確定',
+            cancelButtonText: '繼續訂票'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let formData = {};
+                formData["formInputVal_memberId"] = document.querySelector("#formInputVal_memberId").value;
+                formData["formInputVal_DepartureDate"] = document.querySelector("#formInputVal_DepartureDate").value;
+                formData["formInputVal_TranNo"] = document.querySelector("#formInputVal_TranNo").value;
+                formData["formInputVal_DepartureTime"] = document.querySelector("#formInputVal_DepartureTime").value;
+                formData["formInputVal_ArrivalTime"] = document.querySelector("#formInputVal_ArrivalTime").value;
+                formData["formInputVal_DepartureStation"] = document.querySelector("#formInputVal_DepartureStation").value;
+                formData["formInputVal_ArrivalStation"] = document.querySelector("#formInputVal_ArrivalStation").value;
+                formData["formInputVal_selectedSeats"] = document.querySelector("#formInputVal_selectedSeats").value;
+                formData["formInputVal_price"] = document.querySelector("#formInputVal_price").value;
+                formData["formInputVal_priceTotal"] = document.querySelector("#formInputVal_priceTotal").value;
+                
+                console.log(formData);
+                fetch("services/bookingGo", { 
+                    method: "POST",
+                     headers: {
+                      'Accept': 'application/json',
+                      'Content-type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                }).then(response => response.json())
+                    .then(data => {
+                        if (data.result) {
+                            // 成功的話 Cart_Id 就會在data裡面
+                            
+                            // 用 GET 的方法 丟到sean/addTicketToCart
+                            let uri = `sean/addTicketToCart?ticketCartId=${data.ticketCartId}`;
+                            fetch(uri)
+                                .then(response => response.text()) // 將 ResponseEntity 的 body 解析為 text
+                                .then(responseText => {
+                                    Swal.fire({
+                                        title: '( ｣｡╹o╹｡)｣您的訂票已加入購物車，即將導向購物車頁面',
+                                        text: responseText,
+                                        icon: 'success',
+                                        confirmButtonText: 'Ok'
+                                    }).then((result) => { // 顯示 Swal.fire
+                                        if (result.isConfirmed) { // 如果使用者點選確認，則導向新的 URL
+                                            window.location.href = `sean/CartLoginStatus`;
+                                        }
+                                    })
+                                });
+                            
+                        } else {
+                            Swal.fire(
+                                "資料儲存失敗",
+                                data.msg,
+                                "error"
+                            );
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        Swal.fire(
+                            "資料儲存失敗",
+                            "無法儲存數據，請重試。",
+                            "error"
+                        );
+                    });
+            } else {
+                return false;
+            }
+        });
+    });
+});
+
 	</script>
 </body>
 
