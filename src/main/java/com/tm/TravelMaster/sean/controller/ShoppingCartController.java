@@ -30,7 +30,7 @@ import com.tm.TravelMaster.chih.model.Member;
 import com.tm.TravelMaster.leo.model.Playone;
 import com.tm.TravelMaster.ming.db.service.HighSpeedRailService;
 import com.tm.TravelMaster.ming.db.service.TicketInfoService;
-import com.tm.TravelMaster.ming.model.entity.ShoppingCart;
+import com.tm.TravelMaster.ming.model.entity.TicketInfoGroup;
 import com.tm.TravelMaster.ming.model.entity.TicketInfo;
 import com.tm.TravelMaster.sean.model.LinePayRequest;
 import com.tm.TravelMaster.sean.model.LinePayResponse;
@@ -69,7 +69,7 @@ public class ShoppingCartController {
 			// 加載購物車資訊
 			List<ProductBean> productCart = shoppingService.loadProductCartData(memberNum);
 			List<Playone> playoneCart = shoppingService.loadPlayoneCartData(memberNum);
-			List<ShoppingCart> ShoppingCart = shoppingService.loadTicketCartData(memberNum);
+			List<TicketInfoGroup> ShoppingCart = shoppingService.loadTicketCartData(memberNum);
 
 			// 將購物車資料添加到 Model 中
 			model.addAttribute("products", productCart);
@@ -158,26 +158,26 @@ public class ShoppingCartController {
 
 		String memberNum = member.getMemberNum();
 
-		ShoppingCart lastShoppingCart = ticketsService.findShoppingCartById(ticketCartId); // 最新一筆購物車紀錄
-		System.out.println("lastShoppingCart在這: " + lastShoppingCart);
+		TicketInfoGroup lastTicketInfoGroup = ticketsService.findShoppingCartById(ticketCartId); // 最新一筆購物車紀錄
+		System.out.println("lastShoppingCart在這: " + lastTicketInfoGroup);
 		Map<Integer, String> Id2StationMap = highSpeedRailService.getStationInfoMap(); // 站 ID-名稱 對應表
 		Map<String, Integer> Station2IdMap = new HashMap<>(); // 站 ID-名稱 對應表
 		for (Entry<Integer, String> entry : Id2StationMap.entrySet()) {
 			Station2IdMap.put(entry.getValue(), entry.getKey());
 		}
-		List<TicketInfo> ticketInfos = lastShoppingCart.getTicketInfos(); // 全部的票
+		List<TicketInfo> ticketInfos = lastTicketInfoGroup.getTicketInfos(); // 全部的票
 		System.out.println("ticketInfos在這: " + ticketInfos);
 		for (TicketInfo ticketInfo : ticketInfos) {
 			ticketInfo.setDepartureST(Id2StationMap.get(Integer.parseInt(ticketInfo.getDepartureST())));
 			ticketInfo.setDestinationST(Id2StationMap.get(Integer.parseInt(ticketInfo.getDestinationST())));
 		}
 		// 加載購物車資訊(這邊會對DB資料進行update)
-		List<ShoppingCart> currentCarts = shoppingService.loadTicketCartData(memberNum);
-		if (shoppingService.isCartExists(currentCarts, lastShoppingCart.getCart_Id())) {
+		List<TicketInfoGroup> currentCarts = shoppingService.loadTicketCartData(memberNum);
+		if (shoppingService.isCartExists(currentCarts, lastTicketInfoGroup.getCart_Id())) {
 			return new ResponseEntity<>("訂票已存在於購物車中", HttpStatus.OK);
 		} else {
 			// 添加訂票到購物車
-			currentCarts.add(lastShoppingCart);
+			currentCarts.add(lastTicketInfoGroup);
 		}
 		// 因DB資料被修改，所以要重新修改回去
 		shoppingService.saveTicketCartData(memberNum, currentCarts);
@@ -273,14 +273,14 @@ public class ShoppingCartController {
 			Member member = (Member) session.getAttribute("mbsession");
 			String memberNum = member != null ? member.getMemberNum() : "";
 			// load這邊會update DB的資料
-			List<ShoppingCart> cart = shoppingService.loadTicketCartData(memberNum);
+			List<TicketInfoGroup> cart = shoppingService.loadTicketCartData(memberNum);
 
 			// 加載購物車資訊
 			if (cart != null) {
 				List<TicketInfo> ticketInfos = null;
-				Iterator<ShoppingCart> iterator = cart.iterator();
+				Iterator<TicketInfoGroup> iterator = cart.iterator();
 				while (iterator.hasNext()) {
-					ShoppingCart item = iterator.next();
+					TicketInfoGroup item = iterator.next();
 					List<TicketInfo> tickets = item.getTicketInfos();
 					for (TicketInfo ticket : tickets) {
 						if (ticket.getTicketID() == ticketId) {

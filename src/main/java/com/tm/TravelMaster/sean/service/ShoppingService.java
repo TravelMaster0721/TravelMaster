@@ -7,7 +7,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tm.TravelMaster.chih.model.Member;
 import com.tm.TravelMaster.leo.model.Playone;
-import com.tm.TravelMaster.ming.model.entity.ShoppingCart;
+import com.tm.TravelMaster.ming.model.entity.TicketInfoGroup;
 import com.tm.TravelMaster.sean.model.OrdersBean;
 import com.tm.TravelMaster.sean.model.OrderItemsBean;
 import com.tm.TravelMaster.sean.model.ProductBean;
@@ -25,7 +25,7 @@ import java.util.UUID;
 public class ShoppingService {
 
 	// JSON儲存路徑 
-	private static final String CART_DATA_DIRECTORY = "D:\\TravelMaster\\workspace\\TravelMaster\\src\\data\\cart_data";
+	private static final String CART_DATA_DIRECTORY = "D:\\TravelMaster\\TravelMaster\\src\\data\\cart_data";
 
 	// 導入JPA
 	private final OrdersRepository ordersRepository;
@@ -71,14 +71,14 @@ public class ShoppingService {
 	}
 
 	// 訂票-載入購物車JSON
-	public List<ShoppingCart> loadTicketCartData(String memberNum) {
-		List<ShoppingCart> cart = new ArrayList<>();
+	public List<TicketInfoGroup> loadTicketCartData(String memberNum) {
+		List<TicketInfoGroup> cart = new ArrayList<>();
 		ObjectMapper objectMapper = new ObjectMapper();
 
 		try {
 			File file = new File(CART_DATA_DIRECTORY + File.separator + memberNum + "_Ticket.json");
 			if (file.exists()) {
-				cart = objectMapper.readValue(file, new TypeReference<List<ShoppingCart>>() {
+				cart = objectMapper.readValue(file, new TypeReference<List<TicketInfoGroup>>() {
 				});
 			}
 		} catch (IOException e) {
@@ -111,7 +111,7 @@ public class ShoppingService {
 	}
 
 	// 訂票-儲存購物車JSON資訊至本地端
-	public void saveTicketCartData(String memberNum, List<ShoppingCart> cart) {
+	public void saveTicketCartData(String memberNum, List<TicketInfoGroup> cart) {
 		ObjectMapper objectMapper = new ObjectMapper();
 		File file = new File(CART_DATA_DIRECTORY + File.separator + memberNum + "_Ticket.json");
 		try {
@@ -137,8 +137,8 @@ public class ShoppingService {
 	}
 
 	// 訂票-重複訂票判斷
-	public boolean isCartExists(List<ShoppingCart> carts, int cartId) {
-		for (ShoppingCart cart : carts) {
+	public boolean isCartExists(List<TicketInfoGroup> carts, int cartId) {
+		for (TicketInfoGroup cart : carts) {
 			if (cart.getCart_Id() == cartId) {
 				return true;
 			}

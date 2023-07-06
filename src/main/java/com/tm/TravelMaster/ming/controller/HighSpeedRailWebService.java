@@ -29,7 +29,7 @@ import com.tm.TravelMaster.ming.model.dto.HighSpeedRailTicket;
 import com.tm.TravelMaster.ming.model.dto.TrainTimeInfo;
 import com.tm.TravelMaster.ming.model.entity.TicketInfo;
 import com.tm.TravelMaster.ming.model.entity.TranInfo;
-import com.tm.TravelMaster.ming.model.entity.ShoppingCart;
+import com.tm.TravelMaster.ming.model.entity.TicketInfoGroup;
 
 @Controller
 @RequestMapping("/services")
@@ -73,10 +73,6 @@ public class HighSpeedRailWebService {
 			tkDataLst.add(tk.getArrivaltime());
 			tkDataLst.add(Integer.toString(tk.getPrice()));
 			tkDataLst.add(tk.getBookingdate());
-			tkDataLst.add("<button class=\"btn btn-light\" onclick=\"updateTarget(" + tk.getTicketID()
-					+ ")\"><i class=\"fa-solid fa-pen-to-square\"></i> </button>");
-			tkDataLst.add("<button class=\"btn btn-light\" onclick=\"deleteTarget(" + tk.getTicketID()
-					+ ")\"><i class=\"fa-solid fa-trash-can\"></i> </button>");
 			dataList.add(tkDataLst);
 		}
 		inputMap.put("data", dataList);
@@ -181,7 +177,7 @@ public class HighSpeedRailWebService {
 			result = false;
 			resultErrMsg = "前端資料獲取失敗";
 		}
-		ShoppingCart shoppingCart = null;
+		TicketInfoGroup shoppingCart = null;
 		if (result) {
 			String[] selectedSeats = bookingGoForm.getFormInputVal_selectedSeats().split(",");
 			List<TicketInfo> ticketInfos = new ArrayList<>();
@@ -200,7 +196,7 @@ public class HighSpeedRailWebService {
 				ticketInfo.setBookingdate(today);
 				ticketInfos.add(ticketInfo);
 			}
-			shoppingCart = new ShoppingCart();
+			shoppingCart = new TicketInfoGroup();
 			shoppingCart.setTicketInfos(ticketInfos);
 			shoppingCart.setMember_id(bookingGoForm.getFormInputVal_memberId());
 			shoppingCart.setStatus(0);

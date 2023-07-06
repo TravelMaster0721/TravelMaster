@@ -1,11 +1,5 @@
 
 $(document).ready(function() {
-	$('#queryResult').hide();
-});
-
-//var basePath = window.location.protocol + "//" + window.location.hostname + ":" + location.port + '/TM';
-
-function show() {
 	let table;
 	let allTicketInfoDataSource = "services/GetAllTicketInfo";
 
@@ -17,8 +11,7 @@ function show() {
 		});
 	}
 	table.ajax.reload();
-	$('#queryResult').show();
-}
+});
 
 function insertRecord() {
 	location.href = `highSpeedRail/insert`;

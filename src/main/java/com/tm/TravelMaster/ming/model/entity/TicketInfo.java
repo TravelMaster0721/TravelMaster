@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tm.TravelMaster.ming.model.dto.HighSpeedRailTicket;
 
 import jakarta.persistence.CascadeType;
@@ -15,7 +14,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -56,7 +54,7 @@ public class TicketInfo {
 	@Column(name = "BookingDate")
 	private String bookingdate;
 	
-	// ↓ 這才是真正的欄位資訊(FK) 設定 insertable=false, updatable=false 因為希望由 ShoppingCart 這張表去更新
+	// ↓ 這才是真正的欄位資訊(FK) 設定 insertable=false, updatable=false 因為希望由 TicketInfoGroup 這張表去更新
 	@Column(name = "cart_Id", insertable=false, updatable=false) 
 	private int cartId;
 		
@@ -64,7 +62,7 @@ public class TicketInfo {
 	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
 	@JoinColumn(name = "cart_Id")
 	// 這個是對應的物件 跟Table無關 純粹是告訴Hibernate對應關係 跟著他走
-	private ShoppingCart shoppingCart;
+	private TicketInfoGroup ticketInfoGroup;
 	
 	public TicketInfo() {
 	}
