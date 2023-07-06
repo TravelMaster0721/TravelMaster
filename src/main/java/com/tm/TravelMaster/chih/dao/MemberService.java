@@ -28,17 +28,17 @@ public class MemberService {
 		mRepo.save(mb);
 	}
 	
-	public Member findById(Integer id) {
-		  Optional<Member> optional = mRepo.findById(id);
-		  if (optional.isPresent()) {
-		            return optional.get();
-		        } 
-		  return null;
-		 }
+	 public Member findById(Integer id) {
+		    Optional<Member> optional = mRepo.findById(id);
+		    if (optional.isPresent()) {
+		              return optional.get();
+		          } 
+		    return null;
+		   }
 
 	public boolean checkLogin(String memberAcc, String memberPwd) {
 		Member member = mRepo.findByMemberAcc(memberAcc);
-		if (member != null) {
+		if (member != null && member.getAuth_provider().equals("local")) {
 			if(pwdEncoder.matches(memberPwd, member.getMemberPwd())) {				
 				return true;
 			}else {
@@ -48,6 +48,11 @@ public class MemberService {
 		return false;
 	}
 
+	public Member findByMemberMail(String memberMail) {
+		Member member = mRepo.findByMemberMail(memberMail);	
+		return member;
+	}
+	
 	public boolean findByMemberAcc(String memberAcc) {
 		Member member = mRepo.findByMemberAcc(memberAcc);
 		if (member != null) {
@@ -81,12 +86,14 @@ public class MemberService {
 		return memberList;
 	}
 
+	public void saveMember(Member member) {
+        mRepo.save(member);
+    }
+	
 	public void updateMember(Member mb) {
 		mb.setMemberPwd(pwdEncoder.encode(mb.getMemberPwd()));
-		mRepo.updateMemberNum(mb.getMemberNum(), mb.getMemberName(), mb.getMemberMail(), mb.getMemberPhone(),
-				mb.getMemberAdd(), mb.getMemberPwd(), mb.getMemberLevel());
+		mRepo.updateMember(mb.getMemberNum(),mb.getMemberName(),mb.getMemberMail(),mb.getMemberPhone(),mb.getMemberAdd(),mb.getMemberPwd(),mb.getMemberLevel());
 	}
-	
 	
 	public void deleteMember(Member mb) {
 		mRepo.delete(mb);

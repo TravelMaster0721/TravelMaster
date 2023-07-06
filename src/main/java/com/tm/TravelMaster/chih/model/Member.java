@@ -7,8 +7,6 @@ import com.tm.TravelMaster.leo.model.Playone;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -61,19 +59,22 @@ public class Member {
 	@Column(name = "resetPwdToken")
 	private String resetPwdToken;
 	
+	@Column(name = "auth_provider")
+	private String auth_provider;
+	
+	public String getAuth_provider() {
+		return auth_provider;
+	}
+
+	public void setAuth_provider(String auth_provider) {
+		this.auth_provider = auth_provider;
+	}
+
 	@Column(name = "playoneLevel",columnDefinition = "int default 0")
     private int playoneLevel;
 	
-	@Enumerated(EnumType.STRING)
-	@Column(name="auth_provider")
-	private AuthenticationProvider authProvider;
-	
 	@OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
 	private Playone playone;
-
-	public Playone getPlayone() { return playone; }
-
-	public void setPlayone(Playone playone) { this.playone = playone; }
 	
 	public Member() {
 	}
@@ -225,14 +226,15 @@ public class Member {
 		this.playoneLevel = playoneLevel;
 	}
 
-	public AuthenticationProvider getAuthProvider() {
-		return authProvider;
+	public Playone getPlayone() {
+		return playone;
 	}
 
-	public void setAuthProvider(AuthenticationProvider authProvider) {
-		this.authProvider = authProvider;
+	public void setPlayone(Playone playone) {
+		this.playone = playone;
 	}
 
+	
 	
 
 	

@@ -25,8 +25,8 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
 	@Modifying
 	@Transactional
     @Query("UPDATE Member SET memberName = :memberName, memberMail = :memberMail, memberPhone = :memberPhone, memberAdd = :memberAdd, memberPwd = :memberPwd, memberLevel = :memberLevel WHERE memberNum = :memberNum")
-	public void updateMemberNum(@Param("memberNum") String memberNum, @Param("memberName") String memberName, @Param("memberMail") String memberMail, @Param("memberPhone") String memberPhone, @Param("memberAdd") String memberAdd, @Param("memberPwd") String memberPwd, @Param("memberLevel") String memberLevel);
-	
+	public void updateMember(@Param("memberNum") String memberNum, @Param("memberName") String memberName, @Param("memberMail") String memberMail, @Param("memberPhone") String memberPhone, @Param("memberAdd") String memberAdd, @Param("memberPwd") String memberPwd, @Param("memberLevel") String memberLevel);
+
 	@Query("FROM Member WHERE memberNum != :myMemberNum AND (memberNum LIKE %:memberNum% OR memberLevel LIKE %:memberLevel%)")
 	public List<Member> findByMemberNumOrMemberLevel(@Param("myMemberNum") String myMemberNum,@Param("memberNum") String memberNum, @Param("memberLevel") String memberLevel);
 	

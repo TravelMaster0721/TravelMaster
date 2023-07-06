@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,14 +160,18 @@ public class ShoppingCartController {
 
 		ShoppingCart lastShoppingCart = ticketsService.findShoppingCartById(ticketCartId); // 最新一筆購物車紀錄
 		System.out.println("lastShoppingCart在這: " + lastShoppingCart);
-		Map<Integer, String> stationMap = highSpeedRailService.getStationInfoMap(); // 站 ID-名稱 對應表
+		Map<Integer, String> Id2StationMap = highSpeedRailService.getStationInfoMap(); // 站 ID-名稱 對應表
+		Map<String, Integer> Station2IdMap = new HashMap<>(); // 站 ID-名稱 對應表
+		for (Entry<Integer, String> entry : Id2StationMap.entrySet()) {
+			Station2IdMap.put(entry.getValue(), entry.getKey());
+		}
 		List<TicketInfo> ticketInfos = lastShoppingCart.getTicketInfos(); // 全部的票
 		System.out.println("ticketInfos在這: " + ticketInfos);
 		for (TicketInfo ticketInfo : ticketInfos) {
-			ticketInfo.setDepartureST(stationMap.get(Integer.parseInt(ticketInfo.getDepartureST())));
-			ticketInfo.setDestinationST(stationMap.get(Integer.parseInt(ticketInfo.getDestinationST())));
+			ticketInfo.setDepartureST(Id2StationMap.get(Integer.parseInt(ticketInfo.getDepartureST())));
+			ticketInfo.setDestinationST(Id2StationMap.get(Integer.parseInt(ticketInfo.getDestinationST())));
 		}
-		// 加載購物車資訊
+		// 加載購物車資訊(這邊會對DB資料進行update)
 		List<ShoppingCart> currentCarts = shoppingService.loadTicketCartData(memberNum);
 		if (shoppingService.isCartExists(currentCarts, lastShoppingCart.getCart_Id())) {
 			return new ResponseEntity<>("訂票已存在於購物車中", HttpStatus.OK);
@@ -173,7 +179,13 @@ public class ShoppingCartController {
 			// 添加訂票到購物車
 			currentCarts.add(lastShoppingCart);
 		}
+		// 因DB資料被修改，所以要重新修改回去
 		shoppingService.saveTicketCartData(memberNum, currentCarts);
+		for (TicketInfo ticketInfo : ticketInfos) {
+			ticketInfo.setDepartureST(Integer.toString(Station2IdMap.get(ticketInfo.getDepartureST())));
+			ticketInfo.setDestinationST(Integer.toString(Station2IdMap.get(ticketInfo.getDestinationST())));
+			ticketsService.updateTicketInfo(ticketInfo);
+		}
 		return new ResponseEntity<>("已成功加入訂票", HttpStatus.OK);
 	}
 
@@ -260,11 +272,12 @@ public class ShoppingCartController {
 		try {
 			Member member = (Member) session.getAttribute("mbsession");
 			String memberNum = member != null ? member.getMemberNum() : "";
-			
+			// load這邊會update DB的資料
 			List<ShoppingCart> cart = shoppingService.loadTicketCartData(memberNum);
-			
+
 			// 加載購物車資訊
 			if (cart != null) {
+				List<TicketInfo> ticketInfos = null;
 				Iterator<ShoppingCart> iterator = cart.iterator();
 				while (iterator.hasNext()) {
 					ShoppingCart item = iterator.next();
@@ -272,11 +285,29 @@ public class ShoppingCartController {
 					for (TicketInfo ticket : tickets) {
 						if (ticket.getTicketID() == ticketId) {
 							tickets.remove(ticket);
+							ticketsService.deleteTicketInfo(ticket);
+							if(tickets.size() == 0) {
+								ticketsService.deleteShoppingCart(item);
+							}
+							ticketInfos = tickets;
 							break;
 						}
 					}
+					
 				}
 				shoppingService.saveTicketCartData(memberNum, cart);
+				
+				Map<Integer, String> Id2StationMap = highSpeedRailService.getStationInfoMap(); // 站 ID-名稱 對應表
+				Map<String, Integer> Station2IdMap = new HashMap<>(); // 站 ID-名稱 對應表
+				for (Entry<Integer, String> entry : Id2StationMap.entrySet()) {
+					Station2IdMap.put(entry.getValue(), entry.getKey());
+				}
+				// 因DB資料被修改，所以要重新修改回去
+				for (TicketInfo ticketInfo : ticketInfos) {
+					ticketInfo.setDepartureST(Integer.toString(Station2IdMap.get(ticketInfo.getDepartureST())));
+					ticketInfo.setDestinationST(Integer.toString(Station2IdMap.get(ticketInfo.getDestinationST())));
+					ticketsService.updateTicketInfo(ticketInfo);
+				}
 			}
 
 			return "redirect:/sean/CartLoginStatus";

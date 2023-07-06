@@ -8,6 +8,8 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -16,19 +18,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.tm.TravelMaster.chih.dao.MemberService;
 import com.tm.TravelMaster.chih.model.Member;
 import com.tm.TravelMaster.leo.model.Playone;
 import com.tm.TravelMaster.leo.model.PlayoneImg;
+import com.tm.TravelMaster.leo.service.PlayoneImgService;
 import com.tm.TravelMaster.leo.service.PlayoneService;
-import com.tm.TravelMaster.sean.model.ProductBean;
-import com.tm.TravelMaster.sean.service.ShoppingService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -39,10 +39,18 @@ public class ClientController {
 	@Autowired
 	private PlayoneService pService;
 	@Autowired
+	private PlayoneImgService piService;
+	@Autowired
 	private MemberService mService;
 	
 	@GetMapping("/playone")
-	public String homePage(Model m) {
+	public String homePage(Model m,HttpSession session) {
+		Member member = (Member) session.getAttribute("mbsession");
+		int playoneLevel = 0;  
+	    if (member != null) {
+	        playoneLevel = member.getPlayoneLevel();
+	    }
+	    
 		List<Playone> playone = pService.findRandomEightByFixedValue();
 
 	    for (Playone p : playone) {
@@ -52,9 +60,12 @@ public class ClientController {
 	            System.out.println("Playone with ID: " + p.getPlayoneId() + " has " + p.getPlayoneImgs().size() + " image(s).");
 	        }
 	    }
-
 	    m.addAttribute("playone", playone);
+	    if (playoneLevel == 1) {
+	        return "leo/client/HomePage2";
+	    }else {
 	    return "leo/client/HomePage";
+	    }
 	}
 
 	@GetMapping("/playoneRegistered")
@@ -127,6 +138,11 @@ public class ClientController {
 		Playone playone = new Playone(pNick, pName, pSex, Integer.parseInt(pBirth), pInterest, pIntroduce,
 				playoneImgBeans, 0,1,mb);
 
+		Member member = (Member) session.getAttribute("mbsession");
+		int playoneLevel = 0;  
+	    if (member != null) {
+	        playoneLevel = member.getPlayoneLevel();
+	    }
 		pService.insertPlayone(playone);
 		List<Playone> playone1 = pService.findRandomEightByFixedValue();
 
@@ -139,7 +155,11 @@ public class ClientController {
 	    }
 
 	    m.addAttribute("playone", playone1);
+	    if (playoneLevel == 1) {
+	        return "leo/client/HomePage2";
+	    }else {
 	    return "leo/client/HomePage";
+	    }
 	}
 
 //----------------------------------------購物車功能------------------------------------------	
@@ -179,10 +199,19 @@ public class ClientController {
 //----------------------------------------搜尋功能------------------------------------------	
 	
 	@GetMapping("/playone/more")
-	public String ajaxMix(@RequestParam(name = "p",defaultValue = "1")Integer pageNumber,Model m){
+	public String ajaxMix(@RequestParam(name = "p",defaultValue = "1")Integer pageNumber,Model m,HttpSession session){
+		Member member = (Member) session.getAttribute("mbsession");
+		int playoneLevel = 0;  
+	    if (member != null) {
+	        playoneLevel = member.getPlayoneLevel();
+	    }
 		Page<Playone> page = pService.findByPage(pageNumber);
 		m.addAttribute("page",page);
-		return "leo/client/morePage";
+		if (playoneLevel == 1) {
+	        return "leo/client/morePage2";
+	    }else {
+	    return "leo/client/morePage";
+	    }
 	}
 
 	@GetMapping("/playone/moreFragment")
@@ -206,10 +235,19 @@ public class ClientController {
 	}
 	
 	@GetMapping("/playone/byId")
-	public String getPlayoneById(@RequestParam("id") Integer playoneId, Model m) {
-	    Playone playone = pService.findById(playoneId);
+	public String getPlayoneById(@RequestParam("id") Integer playoneId, Model m,HttpSession session) {
+		Member member = (Member) session.getAttribute("mbsession");
+		int playoneLevel = 0;  
+	    if (member != null) {
+	        playoneLevel = member.getPlayoneLevel();
+	    }
+		Playone playone = pService.findById(playoneId);
 	    m.addAttribute("playone", playone);
+	    if (playoneLevel == 1) {
+	        return "leo/client/personalPage2";
+	    }else {
 	    return "leo/client/personalPage";
+	    }
 	}
 
 	@GetMapping("/playone/byHistory")
@@ -235,13 +273,78 @@ public class ClientController {
 	    return "leo/client/hotPage";
 	}
 //----------------------------------------修改功能------------------------------------------	
-//----------------------------------------其他功能------------------------------------------	
-	
+
 	@GetMapping("/playone/editById")
 	public String editPlayoneById(@RequestParam("id") Integer playoneId, Model m) {
-	    Playone playone = pService.findById(playoneId);
-	    m.addAttribute("playone", playone);
-	    return "leo/client/personalEditPage";
+		Playone playone = pService.findById(playoneId);
+		m.addAttribute("playone", playone);
+		return "leo/client/personalEditPage";
 	}
+
+	@PutMapping("/playone/clienteditAjax")
+	public ResponseEntity<String> editClientPost(@RequestParam("id") String playoneId,
+	        @RequestParam("nic") String pNick,
+	        @RequestParam("name") String pName,
+	        @RequestParam("sex") String pSex,
+	        @RequestParam("age") String pBirth,
+	        @RequestParam("ins") String pInterest,
+	        @RequestParam("int") String pIntroduce,
+	        Model m) throws IOException {
+		
+		
+	    Logger logger = LoggerFactory.getLogger(PlayoneController.class);
+	    logger.info("id: " + playoneId);
+	    logger.info("nic: " + pNick);
+	    logger.info("name: " + pName);
+	    logger.info("sex: " + pSex);
+	    logger.info("age: " + pBirth);
+	    logger.info("ins: " + pInterest);
+	    logger.info("int: " + pIntroduce);
+		
+	    try {    
+		    pService.updatePlayoneById(playoneId, pNick, pName, pSex, pBirth, pInterest, pIntroduce);
+		    return ResponseEntity.ok("success") ;
+		} catch(NumberFormatException e) {
+			System.out.println("Invalid format for playoneid.");
+			e.printStackTrace();
+			return  ResponseEntity.ok("error") ;
+		} catch(Exception e) {
+			System.out.println("Error in deletion process.");
+			e.printStackTrace();
+			return ResponseEntity.ok("error") ;
+		}
+	}
+	
+	@PostMapping("/playone/clientimgedit")
+	public String playoneImgEdit(@RequestParam("id") Integer playoneId, Model m) {
+		List<PlayoneImg> playoneImgList =piService.findImgById(playoneId);
+		 m.addAttribute("playoneImgList", playoneImgList);
+		return "leo/client/clientPlayoneImg";
+	}
+	
+	@PostMapping("/playone/clientimgnew")
+	public String handlePostRequest(@RequestParam("playoneId") String playoneId,
+	                                @RequestParam("newPlayoneImg") MultipartFile newPlayoneImg,
+	                                Model m) throws IOException {
+
+	    byte[] imgbyte = newPlayoneImg.getBytes();
+
+	    //如果回傳空值就不新增
+	    if (imgbyte != null && imgbyte.length > 0) {
+	        Playone playone = pService.findById(Integer.parseInt(playoneId));
+	        if(playone != null) {
+	            piService.insertPlayonePhoto(imgbyte, playone);
+	        }
+	    }
+
+	    Playone playone = pService.findById(Integer.parseInt(playoneId));
+	    m.addAttribute("playone", playone);
+
+	    return "redirect:/playone/editById?id=" + playoneId;
+
+	}
+	
+//----------------------------------------其他功能------------------------------------------	
+	
 
 }

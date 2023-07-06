@@ -64,9 +64,6 @@
 					<li class="nav-item"><a class="nav-link"
 						th:href="@{/sean/CartLoginStatus}"><i
 							class="fa-solid fa-cart-shopping"></i> 購物車</a></li>
-							
-					<li class="nav-item" ><a class="nav-link click-scroll"
-						th:href="@{/playoneRegistered}"><i class="fa-solid fa-phone"></i> 加入我們</a></li>
 						
 		<li class="nav-item" th:if="${session.mbsession == null}">
 						<a class="nav-link custom-btn btn d-none d-lg-block" th:href="@{/login.controller}">
@@ -97,7 +94,7 @@
 							  </a>
 							
 							  <ul class="dropdown-menu">
-							 	<li><a class="dropdown-item" th:href="@{#}">個人資料</a></li>
+							 	<li><a class="dropdown-item" th:href="@{/playone/editById?(id=${session.playonesession.playoneId})}">修改旅伴資料</a></li>
 							    <li><hr class="dropdown-divider" /></li>
 							 	<li><a class="dropdown-item" th:href="@{/layout/memberCenter}">會員中心</a></li>
 							    <li><hr class="dropdown-divider" /></li>

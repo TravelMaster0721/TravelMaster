@@ -27,7 +27,6 @@ public class TicketInfo {
 	@Id
 	@Column(name = "TicketID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-//	@JsonIgnore //這個屬性不做序列化 是不是要拿掉? "看起來是"
 	private int ticketID;
 
 	@Column(name = "TranNo")
@@ -62,7 +61,7 @@ public class TicketInfo {
 	private int cartId;
 		
 	@JsonBackReference //不由這邊做對面的 JSON序列化
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
 	@JoinColumn(name = "cart_Id")
 	// 這個是對應的物件 跟Table無關 純粹是告訴Hibernate對應關係 跟著他走
 	private ShoppingCart shoppingCart;
