@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.text.SimpleDateFormat;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,6 +28,7 @@ import com.tm.TravelMaster.ming.db.service.TicketInfoService;
 import com.tm.TravelMaster.ming.model.dto.BookingGoForm;
 import com.tm.TravelMaster.ming.model.dto.HighSpeedRailTicket;
 import com.tm.TravelMaster.ming.model.dto.TrainTimeInfo;
+import com.tm.TravelMaster.ming.model.entity.StationInfo;
 import com.tm.TravelMaster.ming.model.entity.TicketInfo;
 import com.tm.TravelMaster.ming.model.entity.TranInfo;
 import com.tm.TravelMaster.ming.model.entity.TicketInfoGroup;
@@ -41,6 +43,7 @@ public class HighSpeedRailWebService {
 	@Autowired
 	private HighSpeedRailService highSpeedRailService;
 
+	// 使用者頁面 查詢時刻表區間 (使用Page做分頁)
 	@GetMapping(value = "/GetTranInfo", produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public String GetTranInfo(@RequestParam("departureST") String departureST,
@@ -54,6 +57,7 @@ public class HighSpeedRailWebService {
 		return json;
 	}
 
+	// 管理者後台 查看消費者之訂票紀錄
 	@GetMapping("/GetAllTicketInfo")
 	@ResponseBody
 	public String GetAllTicketInfo() {
@@ -81,6 +85,106 @@ public class HighSpeedRailWebService {
 		return json;
 	}
 
+	// 依據訂票紀錄的(抵達站)作為熱門目的的資料分析
+	@GetMapping("/GetHotSpotChartData")
+	@ResponseBody
+	public String GetHotSpotChartData() {
+		Map<String, List<String>> inputMap = new HashMap<String, List<String>>();
+		// x軸:['x', '南港', '台北', '板橋', '桃園', '新竹', '苗栗', '台中', '彰化', '雲林', '嘉義', '台南',
+		// '左營']
+		List<StationInfo> stations = highSpeedRailService.findAllStationInfo();
+		List<String> stationNames = new ArrayList<>();
+		stationNames.add("x");
+		for (StationInfo station : stations) {
+			stationNames.add(station.getStationName());
+		}
+
+		List<TicketInfo> ticketInfos = ticketsService.findAllTicketInfo();
+		Map<Integer, Integer> stationsCountMap = new HashMap<>();
+		for (TicketInfo ticketInfo : ticketInfos) {
+			int stationID = Integer.parseInt(ticketInfo.getDestinationST());
+			if (stationsCountMap.containsKey(stationID)) {
+				int tmp = stationsCountMap.get(stationID);
+				tmp++;
+				stationsCountMap.put(stationID, tmp);
+			} else {
+				stationsCountMap.put(stationID, 1);
+			}
+		}
+		// y軸:['TopStation', '2', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
+		List<String> stationCountNames = new ArrayList<>();
+		stationCountNames.add("TopStation");
+		for (StationInfo station : stations) {
+			if (stationsCountMap.containsKey(station.getStationID())) {
+				stationCountNames.add(Integer.toString(stationsCountMap.get(station.getStationID())));
+			} else {
+				stationCountNames.add("0");
+			}
+		}
+
+		inputMap.put("x", stationNames); // "x": [南港, 台北, 板橋... 左營],
+		inputMap.put("TopStation", stationCountNames);
+		/*
+		 * json: { "x": [南港, 台北, 板橋 ... 左營], "各站統計" : [200, 130, 90 ... 220] // 數目 }
+		 */
+		String json = new Gson().toJson(inputMap);
+		return json;
+	}
+
+	// 依據消費者訂票紀錄的(票價(Total)、訂票日期)作為資料分析
+	@GetMapping("/AnalysisTicketSales")
+	@ResponseBody
+	public String GetTicketSalesData() {
+		Map<String, List<String>> inputMap = new HashMap<String, List<String>>();
+
+		// x軸:['x', '2023-01-02', '2023-02-11',...,'2023-12-30'] 到c3.js再改成指定月份
+		List<TicketInfo> ticketInfos = ticketsService.findAllTicketInfo();
+		List<String> bookingdates = new ArrayList<>();
+		bookingdates.add("x");
+		for (TicketInfo ticketinfo : ticketInfos) {
+			bookingdates.add(ticketinfo.getBookingdate());
+		}
+
+		// 將訂票日期格式化只取月份
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat monthFormat = new SimpleDateFormat("MM");
+
+		// 統計不同月份的訂票紀錄
+		Map<String, Integer> monthlyCount = new HashMap<>();
+		for (TicketInfo ticketInfo : ticketInfos) {
+			try {
+				Date bookingDate = dateFormat.parse(ticketInfo.getBookingdate());
+				String month = monthFormat.format(bookingDate);
+
+				if (monthlyCount.containsKey(month)) {
+					int currentCount = monthlyCount.get(month);
+					currentCount++;
+					monthlyCount.put(month, currentCount);
+				} else {
+					monthlyCount.put(month, 1);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		int totalMonthCount = monthlyCount.size();
+		// y軸:統計當月收益(1-12月)
+		List<String> monthlyIncome = new ArrayList<>();
+		monthlyIncome.add("monthlyIncome");
+		
+
+		
+
+		inputMap.put("x", bookingdates);
+		/*
+		 * json: { "x": [01,02,03,...,12], "各月份收益統計" : [200, 130, 90 ... 220] }
+		 */
+		String json = new Gson().toJson("");
+		return json;
+	}
+
+	// 刪除 使用者消費紀錄
 	@GetMapping(value = "/DeleteTicketInfo", produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public String DeleteTicketInfo(@RequestParam("id") String id) {
@@ -90,6 +194,7 @@ public class HighSpeedRailWebService {
 		return json;
 	}
 
+	// 批次上傳班次時刻表
 	@PostMapping(value = "/BatchUploadTrainInfo", produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public String BatchUploadTrainInfo(@RequestParam("file") MultipartFile file) throws IOException {
@@ -166,6 +271,7 @@ public class HighSpeedRailWebService {
 		return json;
 	}
 
+	// 將訂票紀錄以DTO方式傳入DB的TicketInfo Table
 	@PostMapping(value = "/bookingGo", produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public String bookingGo(@RequestBody BookingGoForm bookingGoForm, Model model) {
@@ -201,15 +307,14 @@ public class HighSpeedRailWebService {
 			shoppingCart.setMember_id(bookingGoForm.getFormInputVal_memberId());
 			shoppingCart.setStatus(0);
 			try {
-				 // 這裡的目的要是拿到剛剛insert的Cart_Id是多少， 因為你的ID 是讓DB自己去長的
+				// 這裡的目的要是拿到剛剛insert的Cart_Id是多少， 因為你的ID 是讓DB自己去長的
 				shoppingCart = ticketsService.insertShoppingCart(shoppingCart);
 			} catch (SQLException e) {
 				resultErrMsg = e.getMessage();
 			}
 		}
 		String json = String.format("{\"result\":%s, \"msg\":\"%s\", \"ticketCartId\":\"%s\"}",
-				result ? "true" : "false", 
-				result ? "資料儲存成功" : String.format("資料儲存失敗(%s)", resultErrMsg),
+				result ? "true" : "false", result ? "資料儲存成功" : String.format("資料儲存失敗(%s)", resultErrMsg),
 				shoppingCart == null ? "-1" : shoppingCart.getCart_Id()); // 把Cart_Id 丟回AJAX
 		System.out.println(json);
 		return json;

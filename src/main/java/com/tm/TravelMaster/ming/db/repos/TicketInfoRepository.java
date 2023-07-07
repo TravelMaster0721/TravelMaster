@@ -11,4 +11,6 @@ import com.tm.TravelMaster.ming.model.entity.TicketInfo;
 public interface TicketInfoRepository extends JpaRepository<TicketInfo, Integer>{
 
 	List<TicketInfo> findByCartIdIs(int cart_Id);
+	
+	List<TicketInfo> findByDestinationST(String destinationST);
 }

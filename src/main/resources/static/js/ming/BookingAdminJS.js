@@ -64,3 +64,28 @@ function deleteTarget(deleteTarget) {
 		}
 	});
 }
+
+// 統計圖表
+// 將allTicketInfoDataSource的資料存放在allTicketData陣列中
+var allTicketData = [];
+$.ajax({
+	url: allTicketInfoDataSource,
+	method: 'GET',
+	async: false,
+	success: function(data) {
+		allTicketData = data.data.map(function(row) {
+			return row[4];
+		});
+	}
+});
+
+// 使用allTicketData進行統計並繪製C3圖表
+var chart = c3.generate({
+	bindto: '#chart',
+	data: {
+		columns: [
+			['抵達站', ...allTicketData]
+		]
+	}
+});
+
