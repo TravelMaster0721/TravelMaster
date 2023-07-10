@@ -113,7 +113,7 @@ public class HighSpeedRailWebService {
 		}
 		// y軸:['TopStation', '2', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
 		List<String> stationCountNames = new ArrayList<>();
-		stationCountNames.add("熱門目的地"); 
+		stationCountNames.add("熱門目的地");
 		for (StationInfo station : stations) {
 			if (stationsCountMap.containsKey(station.getStationID())) {
 				stationCountNames.add(Integer.toString(stationsCountMap.get(station.getStationID())));
@@ -162,41 +162,94 @@ public class HighSpeedRailWebService {
 		int leastYear = Integer.parseInt(yearFormat.format(tmpDate)); // 最小年度
 		int currentYear = Integer.parseInt(yearFormat.format(new Date())); // 當前年度
 
-		List<String> departureDates = new ArrayList<>();
-		departureDates.add("x");
+		List<String> departureDates_allYear = new ArrayList<>(); // All years
+		List<String> departureDates_3Year = new ArrayList<>(); // 3 years
+		List<String> departureDates_1Year = new ArrayList<>(); // 1 years
+		departureDates_allYear.add("x");
+		departureDates_3Year.add("x");
+		departureDates_1Year.add("x");
 		for (int i = leastYear; i <= currentYear; i++) {
+			departureDates_allYear.add(String.format("%d-01-01", i)); // All years
 			// 把每一年的每個月分 丟到List 裡面
-			for (String monthStr : monthsStr) {
-				departureDates.add(String.format("%d-%s-01", i, monthStr)); 
+			if ((currentYear - leastYear) <= 3) {
+				for (String monthStr : monthsStr) {
+					departureDates_3Year.add(String.format("%d-%s-01", i, monthStr));
+				}
+			}
+			if (currentYear == i) {
+				for (String monthStr : monthsStr) {
+					departureDates_1Year.add(String.format("%d-%s-01", i, monthStr));
+				}
 			}
 		}
-		// X軸資料串列 [x, 2021-01, 2021-02, .... 2021-12, 2022-01, ... ,2022-12, 2023-01 ... 2023-12]
+		// X軸資料串列 [x, 2021-01, 2021-02, .... 2021-12, 2022-01, ... ,2022-12, 2023-01 ...
+		// 2023-12]
 
 		// yearMonthFormat
-		Map<String, Integer> monthlyIncomeMap = new HashMap<>(); // 各月份收益 
-		for (int i = 1; i < departureDates.size(); i++) { // 跳過第一個(因為是 "x")
-			monthlyIncomeMap.put(departureDates.get(i), 0); // 全部先初始化成0
+		Map<String, Integer> allYearIncomeMap = new HashMap<>(); // 全年度收益
+		Map<String, Integer> Last3YearIncomeMap = new HashMap<>(); // 最近三年月份收益
+		Map<String, Integer> ThisYearIncomeMap = new HashMap<>(); // 當年月份收益
+		for (int i = 1; i < departureDates_allYear.size(); i++) { // 跳過第一個(因為是 "x")
+			allYearIncomeMap.put(departureDates_allYear.get(i), 0); // 全部先初始化成0
 		}
+		for (int i = 1; i < departureDates_3Year.size(); i++) { // 跳過第一個(因為是 "x")
+			Last3YearIncomeMap.put(departureDates_3Year.get(i), 0); // 全部先初始化成0
+		}
+		for (int i = 1; i < departureDates_1Year.size(); i++) { // 跳過第一個(因為是 "x")
+			ThisYearIncomeMap.put(departureDates_1Year.get(i), 0); // 全部先初始化成0
+		}
+		
 		for (TicketInfo ticketInfo : ticketInfos) { // 把 "以日為單位" 的資料 統整進 "以月為單位"
 			try {
 				Date departureDate = dateFormat.parse(ticketInfo.getDeparturedate());
-				String yearMonthStr = yearMonthFormat.format(departureDate) + "-01";
-				int currentIncome = monthlyIncomeMap.get(yearMonthStr);
-				currentIncome += ticketInfo.getPrice();
-				monthlyIncomeMap.put(yearMonthStr, currentIncome);
+				String[] yearMonthStrArr = (yearMonthFormat.format(departureDate) + "-01").split("-");
+				int currentIncome = 0;
+				String mapKey= yearMonthStrArr[0] + "-01-01";
+				if (allYearIncomeMap.containsKey(mapKey)) { // 看年
+					currentIncome = allYearIncomeMap.get(mapKey);
+					currentIncome += ticketInfo.getPrice();
+					allYearIncomeMap.put(mapKey, currentIncome);
+				}
+				mapKey= yearMonthStrArr[0] + "-" + yearMonthStrArr[1] + "-01";
+				if (Last3YearIncomeMap.containsKey(mapKey)) { // 看年+月
+					currentIncome = Last3YearIncomeMap.get(mapKey);
+					currentIncome += ticketInfo.getPrice();
+					Last3YearIncomeMap.put(mapKey, currentIncome);
+				}
+				if (ThisYearIncomeMap.containsKey(mapKey)) { // 看年+月
+					currentIncome = ThisYearIncomeMap.get(mapKey);
+					currentIncome += ticketInfo.getPrice();
+					ThisYearIncomeMap.put(mapKey, currentIncome);
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 
-		List<String> monthlyIncome = new ArrayList<>();
-		monthlyIncome.add("票價收益");
-		for (int i = 1; i < departureDates.size(); i++) { // 跳過第一個(因為是 "x")
-			monthlyIncome.add(Integer.toString(monthlyIncomeMap.get(departureDates.get(i))));
+		List<String> allYearIncome = new ArrayList<>();
+		List<String> Last3YearIncome = new ArrayList<>();
+		List<String> thisYearIncome = new ArrayList<>();
+		
+		allYearIncome.add("全年度票價收益");
+		for (int i = 1; i < departureDates_allYear.size(); i++) { // 跳過第一個(因為是 "x")
+			allYearIncome.add(Integer.toString(allYearIncomeMap.get(departureDates_allYear.get(i))));
 		}
-
-		inputMap.put("x", departureDates);
-		inputMap.put("Income", monthlyIncome); 
+		Last3YearIncome.add("近三年票價收益");
+		for (int i = 1; i < departureDates_3Year.size(); i++) { // 跳過第一個(因為是 "x")
+			Last3YearIncome.add(Integer.toString(Last3YearIncomeMap.get(departureDates_3Year.get(i))));
+		}
+		thisYearIncome.add("本年度票價收益");
+		for (int i = 1; i < departureDates_1Year.size(); i++) { // 跳過第一個(因為是 "x")
+			thisYearIncome.add(Integer.toString(ThisYearIncomeMap.get(departureDates_1Year.get(i))));
+		}
+		inputMap.put("x_all", departureDates_allYear);
+		inputMap.put("Income_all", allYearIncome);
+		
+		inputMap.put("x_3y", departureDates_3Year);
+		inputMap.put("Income_3y", Last3YearIncome);
+		
+		inputMap.put("x_1y", departureDates_1Year);
+		inputMap.put("Income_1y", thisYearIncome);
 
 		/*
 		 * json: { "x": [01,02,03,...,12], "各月份收益統計" : [200, 130, 90 ... 220] }
