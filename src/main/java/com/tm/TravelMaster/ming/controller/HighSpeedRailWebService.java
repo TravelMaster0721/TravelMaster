@@ -113,7 +113,7 @@ public class HighSpeedRailWebService {
 		}
 		// y軸:['TopStation', '2', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
 		List<String> stationCountNames = new ArrayList<>();
-		stationCountNames.add("熱門目的地"); // XD XDD
+		stationCountNames.add("熱門目的地"); 
 		for (StationInfo station : stations) {
 			if (stationsCountMap.containsKey(station.getStationID())) {
 				stationCountNames.add(Integer.toString(stationsCountMap.get(station.getStationID())));
