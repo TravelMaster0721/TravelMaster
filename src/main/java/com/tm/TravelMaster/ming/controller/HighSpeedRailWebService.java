@@ -90,8 +90,8 @@ public class HighSpeedRailWebService {
 	@ResponseBody
 	public String GetHotSpotChartData() {
 		Map<String, List<String>> inputMap = new HashMap<String, List<String>>();
-		// x軸:['x', '南港', '台北', '板橋', '桃園', '新竹', '苗栗', '台中', '彰化', '雲林', '嘉義', '台南',
-		// '左營']
+		// x軸:['x', '南港', '台北', '板橋', '桃園', '新竹', '苗栗', '台中', '彰化', '雲林', '嘉義',
+		// '台南','左營']
 		List<StationInfo> stations = highSpeedRailService.findAllStationInfo();
 		List<String> stationNames = new ArrayList<>();
 		stationNames.add("x");
@@ -113,7 +113,7 @@ public class HighSpeedRailWebService {
 		}
 		// y軸:['TopStation', '2', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
 		List<String> stationCountNames = new ArrayList<>();
-		stationCountNames.add("TopStation");
+		stationCountNames.add("熱門目的地"); // XD XDD
 		for (StationInfo station : stations) {
 			if (stationsCountMap.containsKey(station.getStationID())) {
 				stationCountNames.add(Integer.toString(stationsCountMap.get(station.getStationID())));
@@ -131,56 +131,78 @@ public class HighSpeedRailWebService {
 		return json;
 	}
 
-	// 依據消費者訂票紀錄的(票價(Total)、訂票日期)作為資料分析
+	private final String[] monthsStr = { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12" };
+
+	// 依據消費者訂票紀錄的作為資料分析
 	@GetMapping("/AnalysisTicketSales")
 	@ResponseBody
 	public String GetTicketSalesData() {
-		Map<String, List<String>> inputMap = new HashMap<String, List<String>>();
-
-		// x軸:['x', '2023-01-02', '2023-02-11',...,'2023-12-30'] 到c3.js再改成指定月份
-		List<TicketInfo> ticketInfos = ticketsService.findAllTicketInfo();
-		List<String> bookingdates = new ArrayList<>();
-		bookingdates.add("x");
-		for (TicketInfo ticketinfo : ticketInfos) {
-			bookingdates.add(ticketinfo.getBookingdate());
-		}
-
 		// 將訂票日期格式化只取月份
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		SimpleDateFormat monthFormat = new SimpleDateFormat("MM");
+		SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
+		SimpleDateFormat yearMonthFormat = new SimpleDateFormat("yyyy-MM");
 
-		// 統計不同月份的訂票紀錄
-		Map<String, Integer> monthlyCount = new HashMap<>();
+		Map<String, List<String>> inputMap = new HashMap<String, List<String>>();
+
+		List<TicketInfo> ticketInfos = ticketsService.findAllTicketInfo();
+
+		Date tmpDate;
+		long leastDate = Long.MAX_VALUE;
 		for (TicketInfo ticketInfo : ticketInfos) {
 			try {
-				Date bookingDate = dateFormat.parse(ticketInfo.getBookingdate());
-				String month = monthFormat.format(bookingDate);
-
-				if (monthlyCount.containsKey(month)) {
-					int currentCount = monthlyCount.get(month);
-					currentCount++;
-					monthlyCount.put(month, currentCount);
-				} else {
-					monthlyCount.put(month, 1);
+				tmpDate = dateFormat.parse(ticketInfo.getDeparturedate());
+				if (leastDate > tmpDate.getTime()) {
+					leastDate = tmpDate.getTime(); // 找出最早的一天(找最小年度)
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+		tmpDate = new Date(leastDate);
+		int leastYear = Integer.parseInt(yearFormat.format(tmpDate)); // 最小年度
+		int currentYear = Integer.parseInt(yearFormat.format(new Date())); // 當前年度
 
-		int totalMonthCount = monthlyCount.size();
-		// y軸:統計當月收益(1-12月)
+		List<String> departureDates = new ArrayList<>();
+		departureDates.add("x");
+		for (int i = leastYear; i <= currentYear; i++) {
+			// 把每一年的每個月分 丟到List 裡面
+			for (String monthStr : monthsStr) {
+				departureDates.add(String.format("%d-%s-01", i, monthStr)); 
+			}
+		}
+		// X軸資料串列 [x, 2021-01, 2021-02, .... 2021-12, 2022-01, ... ,2022-12, 2023-01 ... 2023-12]
+
+		// yearMonthFormat
+		Map<String, Integer> monthlyIncomeMap = new HashMap<>(); // 各月份收益 
+		for (int i = 1; i < departureDates.size(); i++) { // 跳過第一個(因為是 "x")
+			monthlyIncomeMap.put(departureDates.get(i), 0); // 全部先初始化成0
+		}
+		for (TicketInfo ticketInfo : ticketInfos) { // 把 "以日為單位" 的資料 統整進 "以月為單位"
+			try {
+				Date departureDate = dateFormat.parse(ticketInfo.getDeparturedate());
+				String yearMonthStr = yearMonthFormat.format(departureDate) + "-01";
+				int currentIncome = monthlyIncomeMap.get(yearMonthStr);
+				currentIncome += ticketInfo.getPrice();
+				monthlyIncomeMap.put(yearMonthStr, currentIncome);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
 		List<String> monthlyIncome = new ArrayList<>();
-		monthlyIncome.add("monthlyIncome");
-		
+		monthlyIncome.add("票價收益");
+		for (int i = 1; i < departureDates.size(); i++) { // 跳過第一個(因為是 "x")
+			monthlyIncome.add(Integer.toString(monthlyIncomeMap.get(departureDates.get(i))));
+		}
 
-		
+		inputMap.put("x", departureDates);
+		inputMap.put("Income", monthlyIncome); 
 
-		inputMap.put("x", bookingdates);
 		/*
 		 * json: { "x": [01,02,03,...,12], "各月份收益統計" : [200, 130, 90 ... 220] }
 		 */
-		String json = new Gson().toJson("");
+
+		String json = new Gson().toJson(inputMap);
 		return json;
 	}
 
