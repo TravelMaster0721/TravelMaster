@@ -90,18 +90,18 @@ public class HighSpeedRailWebService {
 	@ResponseBody
 	public String GetHotSpotChartData() {
 		Map<String, List<String>> inputMap = new HashMap<String, List<String>>();
-		// x軸:['x', '南港', '台北', '板橋', '桃園', '新竹', '苗栗', '台中', '彰化', '雲林', '嘉義',
-		// '台南','左營']
+		
 		List<StationInfo> stations = highSpeedRailService.findAllStationInfo();
-		List<String> stationNames = new ArrayList<>();
+		List<String> stationNames = new ArrayList<>(); // x軸:['x','南港','台北','板橋','桃園',...,'台南','左營']
 		stationNames.add("x");
 		for (StationInfo station : stations) {
 			stationNames.add(station.getStationName());
 		}
 
+		// 計算各站(DestinationST)總共有幾個
 		List<TicketInfo> ticketInfos = ticketsService.findAllTicketInfo();
 		Map<Integer, Integer> stationsCountMap = new HashMap<>();
-		for (TicketInfo ticketInfo : ticketInfos) {
+		for (TicketInfo ticketInfo : ticketInfos) { 
 			int stationID = Integer.parseInt(ticketInfo.getDestinationST());
 			if (stationsCountMap.containsKey(stationID)) {
 				int tmp = stationsCountMap.get(stationID);
@@ -111,8 +111,8 @@ public class HighSpeedRailWebService {
 				stationsCountMap.put(stationID, 1);
 			}
 		}
-		// y軸:['TopStation', '2', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
-		List<String> stationCountNames = new ArrayList<>();
+		
+		List<String> stationCountNames = new ArrayList<>(); // y軸:['TopStation','2','0', '0',...,'0','0']
 		stationCountNames.add("熱門目的地");
 		for (StationInfo station : stations) {
 			if (stationsCountMap.containsKey(station.getStationID())) {
@@ -122,7 +122,7 @@ public class HighSpeedRailWebService {
 			}
 		}
 
-		inputMap.put("x", stationNames); // "x": [南港, 台北, 板橋... 左營],
+		inputMap.put("x", stationNames);
 		inputMap.put("TopStation", stationCountNames);
 		/*
 		 * json: { "x": [南港, 台北, 板橋 ... 左營], "各站統計" : [200, 130, 90 ... 220] // 數目 }
@@ -132,7 +132,6 @@ public class HighSpeedRailWebService {
 	}
 
 	private final String[] monthsStr = { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12" };
-
 	// 依據消費者訂票紀錄的作為資料分析
 	@GetMapping("/AnalysisTicketSales")
 	@ResponseBody
@@ -162,28 +161,26 @@ public class HighSpeedRailWebService {
 		int leastYear = Integer.parseInt(yearFormat.format(tmpDate)); // 最小年度
 		int currentYear = Integer.parseInt(yearFormat.format(new Date())); // 當前年度
 
-		List<String> departureDates_allYear = new ArrayList<>(); // All years
-		List<String> departureDates_3Year = new ArrayList<>(); // 3 years
-		List<String> departureDates_1Year = new ArrayList<>(); // 1 years
+		List<String> departureDates_allYear = new ArrayList<>(); // All years ["x","2020-01-01","2021-01-01","2022-01-01","2023-01-01"]
+		List<String> departureDates_3Year = new ArrayList<>(); // 3 years ["x","2021-01-01",..,"2021-12-01","2022-01-01",..,"2022-12-01","2023-01-01",..,"2023-12-01"]
+		List<String> departureDates_1Year = new ArrayList<>(); // 1 years ["x","2023-01-01","2023-02-01",...,"2023-12-01"]
 		departureDates_allYear.add("x");
 		departureDates_3Year.add("x");
 		departureDates_1Year.add("x");
 		for (int i = leastYear; i <= currentYear; i++) {
 			departureDates_allYear.add(String.format("%d-01-01", i)); // All years
 			// 把每一年的每個月分 丟到List 裡面
-			if ((currentYear - leastYear) <= 3) {
+			if ((currentYear - i) <= 3) { // 3 years
 				for (String monthStr : monthsStr) {
 					departureDates_3Year.add(String.format("%d-%s-01", i, monthStr));
 				}
 			}
 			if (currentYear == i) {
-				for (String monthStr : monthsStr) {
+				for (String monthStr : monthsStr) { // 1 years
 					departureDates_1Year.add(String.format("%d-%s-01", i, monthStr));
 				}
 			}
 		}
-		// X軸資料串列 [x, 2021-01, 2021-02, .... 2021-12, 2022-01, ... ,2022-12, 2023-01 ...
-		// 2023-12]
 
 		// yearMonthFormat
 		Map<String, Integer> allYearIncomeMap = new HashMap<>(); // 全年度收益
