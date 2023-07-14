@@ -227,15 +227,15 @@ public class HighSpeedRailWebService {
 		List<String> Last3YearIncome = new ArrayList<>();
 		List<String> thisYearIncome = new ArrayList<>();
 		
-		allYearIncome.add("全年度票價收益");
+		allYearIncome.add("全年度訂票收益");
 		for (int i = 1; i < departureDates_allYear.size(); i++) { // 跳過第一個(因為是 "x")
 			allYearIncome.add(Integer.toString(allYearIncomeMap.get(departureDates_allYear.get(i))));
 		}
-		Last3YearIncome.add("近三年票價收益");
+		Last3YearIncome.add("近三年訂票收益");
 		for (int i = 1; i < departureDates_3Year.size(); i++) { // 跳過第一個(因為是 "x")
 			Last3YearIncome.add(Integer.toString(Last3YearIncomeMap.get(departureDates_3Year.get(i))));
 		}
-		thisYearIncome.add("本年度票價收益");
+		thisYearIncome.add("本年度訂票收益");
 		for (int i = 1; i < departureDates_1Year.size(); i++) { // 跳過第一個(因為是 "x")
 			thisYearIncome.add(Integer.toString(ThisYearIncomeMap.get(departureDates_1Year.get(i))));
 		}
