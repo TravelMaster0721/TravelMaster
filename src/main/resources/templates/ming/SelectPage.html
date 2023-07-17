@@ -128,7 +128,7 @@
 	$(document).ready(function() {
 	var today = new Date();
 	var date = today.getFullYear()+'-'+((today.getMonth()+1 < 10)? '0':'') + (today.getMonth()+1)+'-'+((today.getDate() < 10)? '0':'') + today.getDate();
-	var time = (today.getHours()==0? "00":((today.getHours() < 10)? '0':'') + today.getHours()) + ":" + (today.getMinutes()==0? "00": ((today.getMinutes() < 10)? '0':'') + today.getMinutes());
+	var time = today.getHours() + ":" + today.getMinutes();
 	document.querySelector("#departuredate").value = date;
 	document.querySelector("#departureTime").value = time;
 	
@@ -172,7 +172,7 @@ function search(pageNum = 1) {
 	if (parseInt(departureST.value) == parseInt(destinationST.value)) {
 		Swal.fire(
 			'( ｣｡╹o╹｡)｣',
-			'您的 「起程站」 與 「到達站」 相同 <(ΦωΦ)>',
+			'您的 「出發站」 與 「抵達站」 相同 <(ΦωΦ)>',
 			'warning'
 		)
 		return;

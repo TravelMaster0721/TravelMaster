@@ -1,6 +1,7 @@
 // 購物車動態抓取資訊
 const productQuantityFields = document.querySelectorAll('.quantity-field.product-quantity-field');
 const playoneQuantityFields = document.querySelectorAll('.quantity-field.playone-quantity-field');
+const ticketQuantityFields = document.querySelectorAll('.quantity-field.ticket-quantity-field');
 const totalAmountElement = document.querySelector('#basket-total');
 const totalItemsElement = document.querySelector('.total-items');
 
@@ -29,6 +30,22 @@ function updateCartTotal() {
 		// 陪玩的數量處理
 		const quantity = parseInt(quantityField.value);
 		const price = 3000; // 假設陪玩的價格固定為 3000
+
+		const subtotal = quantity * price;
+
+		// 更新對應的小計元素
+		const subtotalElement = quantityField.parentNode.parentNode.querySelector('.subtotal');
+		subtotalElement.textContent = subtotal;
+
+		totalAmount += subtotal;
+		totalItems += quantity;
+	});
+
+	ticketQuantityFields.forEach((quantityField) => {
+		// 票的數量處理
+		const quantity = parseInt(quantityField.value);
+		const priceElement = quantityField.parentNode.querySelector('[name="ticketPrice"]');
+		const price = parseFloat(priceElement.value);
 
 		const subtotal = quantity * price;
 
@@ -74,7 +91,7 @@ promoCodeInput.addEventListener('blur', function() {
 
 
 //動態修改商品數量(判斷不能大於庫存)-傳後端
-$(".quantity-field.product").change(function() {
+$(".quantity-field.product-quantity-field").change(function() {
 	console.log($(this).val());
 	let val = parseInt($(this).val());
 	let productId = $(this).closest(".basket-product").find(".productId").val();
@@ -96,9 +113,35 @@ $(".quantity-field.product").change(function() {
 			}
 		});
 	} else {
-		console.log("失敗?");
+		// 如果输入的值超过了最大值，就将其设置为最大值
+		$(this).val(max);
+		console.log("输入的数量超过了最大库存");
 	}
 });
+
+//動態修改旅伴天數-傳後端
+$(".quantity-field.playone-quantity-field").change(function() {
+	console.log($(this).val());
+	let val = parseInt($(this).val());
+	let playoneId = $(this).closest(".basket-product").find(".playoneId").val();
+
+	$.ajax({
+		url: "http://localhost:8080/TM/sean/playOneDays",
+		type: "put",
+		data: {
+			"playoneId": playoneId,
+			"playoneDays": $(this).val()
+		},
+		success: function() {
+			console.log("成功修改");
+		},
+		error: function() {
+			console.log('失敗');
+		}
+	});
+});
+
+
 
 //購物車為空前往商品頁的按鈕
 function goToProductPage() {
@@ -132,4 +175,9 @@ function checkout() {
 			}
 		});
 }
+
+// 行程-防止亂輸入報名人數
+$(".quantity-field.product-quantity-field").keydown(function(e) {
+	e.preventDefault();
+});
 

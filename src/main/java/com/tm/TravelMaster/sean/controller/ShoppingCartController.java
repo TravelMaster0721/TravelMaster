@@ -1,13 +1,16 @@
 package com.tm.TravelMaster.sean.controller;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.HashMap;
 import java.util.Map.Entry;
-import java.util.UUID;
+import com.google.gson.Gson;
+import com.opencsv.CSVWriter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,6 +35,7 @@ import com.tm.TravelMaster.ming.db.service.HighSpeedRailService;
 import com.tm.TravelMaster.ming.db.service.TicketInfoService;
 import com.tm.TravelMaster.ming.model.entity.TicketInfoGroup;
 import com.tm.TravelMaster.ming.model.entity.TicketInfo;
+import com.tm.TravelMaster.sean.model.ChartData;
 import com.tm.TravelMaster.sean.model.LinePayRequest;
 import com.tm.TravelMaster.sean.model.LinePayResponse;
 import com.tm.TravelMaster.sean.model.LinePayStatusResponse;
@@ -40,6 +44,7 @@ import com.tm.TravelMaster.sean.model.ProductBean;
 import com.tm.TravelMaster.sean.service.LinePayService;
 import com.tm.TravelMaster.sean.service.ShoppingService;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -58,7 +63,7 @@ public class ShoppingCartController {
 		this.linePayService = linePayService;
 	}
 
-	// 進購物車-登入判定+查詢所有
+	// 購物車-查詢
 	@GetMapping("/sean/CartLoginStatus")
 	public String handleCartLoginStatus(HttpSession session, Model model) {
 		Member member = (Member) session.getAttribute("mbsession");
@@ -75,6 +80,13 @@ public class ShoppingCartController {
 			model.addAttribute("products", productCart);
 			model.addAttribute("playones", playoneCart);
 			model.addAttribute("tickets", ShoppingCart);
+
+			// 判斷購物車是否為空
+			boolean isCartEmpty = productCart.isEmpty() && playoneCart.isEmpty()
+					&& ShoppingCart.stream().allMatch(cart -> cart.getTicketInfos().isEmpty());
+
+			// 將判斷結果添加到 Model 中
+			model.addAttribute("isCartEmpty", isCartEmpty);
 
 			return "sean/ShoppingCart";
 		} else {
@@ -208,6 +220,25 @@ public class ShoppingCartController {
 		return ResponseEntity.ok().build();
 	}
 
+	// 旅伴-更新天數
+	@PutMapping("/sean/playOneDays")
+	public ResponseEntity<Void> updateplayOneDays(@RequestParam("playoneId") int playoneId,
+			@RequestParam("playoneDays") int playoneDays, HttpSession session) {
+		Member member = (Member) session.getAttribute("mbsession");
+		String memberNum = member.getMemberNum();
+
+		// 加載購物車資訊
+		List<Playone> cart = shoppingService.loadPlayoneCartData(memberNum);
+
+		// 更新指定商品的數量
+		shoppingService.updatePlayOneCartQuantity(memberNum, cart, playoneId, playoneDays);
+
+		// 儲存更新後的購物車資訊到本地 JSON 檔案
+		shoppingService.savePlayoneCartData(memberNum, cart);
+
+		return ResponseEntity.ok().build();
+	}
+
 	// 行程-刪除購物車行程
 	@PostMapping("/sean/RemoveCartItem")
 	public String removeCartItem(@RequestParam("productId") Integer productId, HttpSession session) {
@@ -286,17 +317,17 @@ public class ShoppingCartController {
 						if (ticket.getTicketID() == ticketId) {
 							tickets.remove(ticket);
 							ticketsService.deleteTicketInfo(ticket);
-							if(tickets.size() == 0) {
+							if (tickets.size() == 0) {
 								ticketsService.deleteShoppingCart(item);
 							}
 							ticketInfos = tickets;
 							break;
 						}
 					}
-					
+
 				}
 				shoppingService.saveTicketCartData(memberNum, cart);
-				
+
 				Map<Integer, String> Id2StationMap = highSpeedRailService.getStationInfoMap(); // 站 ID-名稱 對應表
 				Map<String, Integer> Station2IdMap = new HashMap<>(); // 站 ID-名稱 對應表
 				for (Entry<Integer, String> entry : Id2StationMap.entrySet()) {
@@ -325,28 +356,39 @@ public class ShoppingCartController {
 		if (memberNum != null) {
 			List<ProductBean> productCart = shoppingService.loadProductCartData(memberNum);
 			List<Playone> playoneCart = shoppingService.loadPlayoneCartData(memberNum);
+			List<TicketInfoGroup> tickets = shoppingService.loadTicketCartData(memberNum);
 
-			if ((productCart != null && !productCart.isEmpty()) || (playoneCart != null && !playoneCart.isEmpty())) {
+			if ((productCart != null && !productCart.isEmpty()) || (playoneCart != null && !playoneCart.isEmpty())
+					|| (tickets != null && !tickets.isEmpty())) {
 				// line pay API
 				String transactionId = null;
 				String paymentStatus = "尚未付款";
 
-				shoppingService.createOrder(member, productCart, playoneCart, transactionId, paymentStatus);
+				OrdersBean orders = shoppingService.createOrder(member, productCart, playoneCart, tickets,
+						transactionId, paymentStatus);
 
-				// 結單後清除購物車
-				productCart.clear();
-				playoneCart.clear();
-				shoppingService.saveCartData(memberNum, productCart);
-				shoppingService.savePlayoneCartData(memberNum, playoneCart);
+				if (orders != null) {
+					// 結單後清除購物車
+					productCart.clear();
+					playoneCart.clear();
+					tickets.clear();
+					shoppingService.saveCartData(memberNum, productCart);
+					shoppingService.savePlayoneCartData(memberNum, playoneCart);
+					shoppingService.saveTicketCartData(memberNum, tickets);
 
-				return new ResponseEntity<>(Collections.singletonMap("message", "Checkout completed successfully."),
-						HttpStatus.OK);
+					return new ResponseEntity<>(Collections.singletonMap("message", "Checkout completed successfully."),
+							HttpStatus.OK);
+				} else {
+					return new ResponseEntity<>(
+							Collections.singletonMap("message", "Checkout failed. Please try again."),
+							HttpStatus.INTERNAL_SERVER_ERROR);
+				}
 			} else {
 				return new ResponseEntity<>(Collections.singletonMap("message", "Cart is empty."), HttpStatus.OK);
 			}
 		}
 		return new ResponseEntity<>(Collections.singletonMap("message", "Checkout failed. Please try again."),
-				HttpStatus.OK);
+				HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	// 訂單-付款
@@ -428,7 +470,7 @@ public class ShoppingCartController {
 	}
 
 	// 全部訂單查詢
-	@GetMapping("/sean/getOrder")
+	@GetMapping("/sean/getAllOrder")
 	public String getOrder(Model model, HttpSession session) {
 		List<OrdersBean> orders = shoppingService.getAllOrders();
 		model.addAttribute("orders", orders);
@@ -436,7 +478,7 @@ public class ShoppingCartController {
 		Member member = (Member) session.getAttribute("mbsession");
 		// 有登入
 		if (member != null) {
-			return "sean/checkoutConfirmation";
+			return "sean/checkoutConfirmationBackStage";
 
 			// 沒登入
 		} else {
@@ -494,5 +536,40 @@ public class ShoppingCartController {
 		List<OrdersBean> orders = shoppingService.searchOrders(keyword);
 		model.addAttribute("orders", orders);
 		return "sean/checkoutConfirmation";
+	}
+
+	// 圖表分析
+	@GetMapping("/sean/graphAnalysis")
+	public String getGraphAnalysis(Model model) {
+		ChartData chartData = shoppingService.getChartData();
+		Gson gson = new Gson();
+		String json = gson.toJson(chartData);
+		model.addAttribute("chartData", json);
+		return "sean/graphAnalysis";
+	}
+
+	// 輸出CSV
+	@GetMapping("/sean/exportCSV")
+	public void exportCSV(HttpServletResponse response) throws IOException {
+		// 設定CSV格式
+		response.setContentType("text/csv");
+		response.setCharacterEncoding("MS950");
+		response.setHeader("Content-Disposition", "attachment; filename=\"report.csv\"");
+
+		// 獲取圖表資訊
+		ChartData chartData = shoppingService.getChartData();
+
+		// 寫成CSV至本地端
+		try (CSVWriter writer = new CSVWriter(response.getWriter())) {
+			// 設置header
+			String[] header = { "Product", "Quantity" };
+			writer.writeNext(header);
+
+			// 迭代輸出
+			for (int i = 0; i < chartData.getLabels().length; i++) {
+				String[] line = { chartData.getLabels()[i], Integer.toString(chartData.getValues()[i]) };
+				writer.writeNext(line);
+			}
+		}
 	}
 }

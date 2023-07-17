@@ -40,10 +40,15 @@ public class UpdateDeleteMemberController {
 			mb.setMemberPhone(memberphone);
 			mb.setMemberAdd(memberadd);
 			mb.setMemberPwd(memberpwd);
+			if(memberlevel.equals("normal_user") || memberlevel.equals("super_user")) {
+				mb.setCheckPwd(0);
+			}
+			if(memberlevel.equals("black_user")) {
+				mb.setCheckPwd(3);
+			}
 			mb.setMemberLevel(memberlevel);
 			mService.updateMember(mb);
 		}
-		System.out.println("123");
 		return "redirect:/tobackstageallmember.controller";
 	}
 	
@@ -60,7 +65,6 @@ public class UpdateDeleteMemberController {
 			mb.setMemberLevel(memberlevel);
 			mService.updateMember(mb);
 		}
-		System.out.println("123");
 		return "redirect:/tobackstageallmember.controller";
 	}
 	
@@ -73,26 +77,26 @@ public class UpdateDeleteMemberController {
 		return "redirect:/tobackstageallmember.controller";
 	}
 	
-	@PutMapping("/updatemember.controller")
-	public String updateMember(@RequestParam("check") String check,@RequestParam("membernum") String membernum,@RequestParam("membername") String mambername,
-			@RequestParam("membermail") String membermail,@RequestParam("memberphone") String memberphone,@RequestParam("memberadd") String memberadd,@RequestParam("memberpwd") String memberpwd,Model m) {
-		if(check.equals("Y")) {	
-			Member mb = mService.findByMemberNum(membernum);
-			mb.setMemberName(mambername);
-			mb.setMemberMail(membermail);
-			mb.setMemberPhone(memberphone);
-			mb.setMemberAdd(memberadd);
-			mb.setMemberPwd(memberpwd);
-			mService.updateMember(mb);
-		}
-		Member member = mService.findByMemberNum(membernum);
-		m.addAttribute("member", member);
-		return "chih/personalBackstage";
-	}
-	
+//	@PutMapping("/updatemember.controller")
+//	public String updateMember(@RequestParam("check") String check,@RequestParam("membernum") String membernum,@RequestParam("membername") String mambername,
+//			@RequestParam("membermail") String membermail,@RequestParam("memberphone") String memberphone,@RequestParam("memberadd") String memberadd,@RequestParam("memberpwd") String memberpwd,Model m) {
+//		if(check.equals("Y")) {	
+//			Member mb = mService.findByMemberNum(membernum);
+//			mb.setMemberName(mambername);
+//			mb.setMemberMail(membermail);
+//			mb.setMemberPhone(memberphone);
+//			mb.setMemberAdd(memberadd);
+//			mb.setMemberPwd(memberpwd);
+//			mService.updateMember(mb);
+//		}
+//		Member member = mService.findByMemberNum(membernum);
+//		m.addAttribute("member", member);
+//		return "chih/personalBackstage";
+//	}
+//	
 	@PutMapping("/updatepersonalmember.controller")
 	public String updatePersonalMember(@RequestParam("check") String check,@RequestParam("membernum") String membernum,@RequestParam("membername") String mambername,
-			@RequestParam("membermail") String membermail,@RequestParam("memberphone") String memberphone,@RequestParam("memberadd") String memberadd,@RequestParam("memberpwd") String memberpwd,Model m) {
+			@RequestParam("membermail") String membermail,@RequestParam("memberphone") String memberphone,@RequestParam("memberadd") String memberadd,@RequestParam("memberpwd") String memberpwd,@RequestParam("tolocation") String tolocation,Model m) {
 		if(check.equals("Y")) {	
 			Member mb = mService.findByMemberNum(membernum);
 			mb.setMemberName(mambername);
@@ -104,7 +108,13 @@ public class UpdateDeleteMemberController {
 		}
 		Member mb = mService.findByMemberNum(membernum);
 		m.addAttribute("mbsession", mb);
-		return "redirect:/layout/index";
+		System.out.println("------------------------------------------------"+tolocation);
+		if(tolocation.equals("backstage")) {
+			return "layout/backstage";
+		}else{
+			return "redirect:/layout/memberCenter";
+		}
+		
 	}
 	
 	@GetMapping("/getpersonphoto.controller")

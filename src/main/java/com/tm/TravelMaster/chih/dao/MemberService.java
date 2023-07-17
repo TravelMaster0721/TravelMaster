@@ -60,6 +60,16 @@ public class MemberService {
 		}
 		return false;
 	}
+	
+	public void addCheckPwd(String memberAcc) {
+		Member member = mRepo.findByMemberAcc(memberAcc);
+		member.setCheckPwd(member.getCheckPwd()+1);
+		mRepo.addCheckPwd(member.getCheckPwd(), memberAcc);
+	}
+	
+	public void updateCheckPwd(String memberAcc) {
+		mRepo.updateCheckPwd(memberAcc);
+	}
 
 	public Member returnByMemberAcc(Member mb) {
 		Member member = mRepo.findByMemberAcc(mb.getMemberAcc());
@@ -91,8 +101,10 @@ public class MemberService {
     }
 	
 	public void updateMember(Member mb) {
-		mb.setMemberPwd(pwdEncoder.encode(mb.getMemberPwd()));
-		mRepo.updateMember(mb.getMemberNum(),mb.getMemberName(),mb.getMemberMail(),mb.getMemberPhone(),mb.getMemberAdd(),mb.getMemberPwd(),mb.getMemberLevel());
+		if(mb.getMemberPwd().length()<20) {
+			mb.setMemberPwd(pwdEncoder.encode(mb.getMemberPwd()));	
+		}
+		mRepo.updateMember(mb.getMemberNum(),mb.getMemberName(),mb.getMemberMail(),mb.getMemberPhone(),mb.getMemberAdd(),mb.getMemberPwd(),mb.getMemberLevel(),mb.getCheckPwd());
 	}
 	
 	public void deleteMember(Member mb) {
@@ -104,7 +116,7 @@ public class MemberService {
 	}
 	
 	public Page<Member> findByPage(Integer pageNumber, Member mb) {
-	    Pageable pageable = PageRequest.of(pageNumber - 1, 5);
+	    Pageable pageable = PageRequest.of(pageNumber - 1, 10);
 
 	    List<Member> members = mRepo.findAllOtherMember(mb.getMemberNum());
 	    int start = (int) pageable.getOffset();
@@ -113,6 +125,29 @@ public class MemberService {
 
 	    Page<Member> page = PageableExecutionUtils.getPage(subList, pageable, () -> members.size());
 	    return page;
+	}
+	
+	public Page<Member> findByPageMember(Integer pageNumber, String searchInput ,Member mb) {
+	    Pageable pageable = PageRequest.of(pageNumber - 1, 10);	    
+	    List<Member> members = mRepo.findAllOtherBySearchText(searchInput, mb.getMemberNum());
+	    List<Member> memberSex=mRepo.findAllOtherBySearchTextSex(searchInput, mb.getMemberNum());
+	    members.addAll(memberSex);
+	    int start = (int) pageable.getOffset();
+	    int end = Math.min((start + pageable.getPageSize()), members.size());
+	    List<Member> subList = members.subList(start, end);
+
+	    Page<Member> page = PageableExecutionUtils.getPage(subList, pageable, () -> members.size());
+	    return page;
+	}
+	
+	public List<Member> findAllOtherBySearchText(String searchInput ,Member mb){
+		 List<Member> members = mRepo.findAllOtherBySearchText(searchInput, mb.getMemberNum());
+		 return members;
+	}
+	
+	public List<Member>findAllOtherBySearchTextSex(String searchInput ,Member mb){
+		List<Member> memberSex=mRepo.findAllOtherBySearchTextSex(searchInput, mb.getMemberNum());
+		 return memberSex;
 	}
 	
 	public void updateResetPwdToken(String token,String email) throws MemberNotFoundException{
@@ -135,5 +170,25 @@ public class MemberService {
 		mb.setResetPwdToken(null);		
 		mRepo.updateMemberPwd(mb.getMemberNum(), mb.getMemberPwd());
 	}
+	
+	public int findMemberSexCount(String sex) {
+       List<Member> mbl=mRepo.findMemberSex(sex);
+       int num=0;
+       for(int i=0 ; i<mbl.size();i++) {
+       	num++;
+       }
+       return num;
+	}
+	
+	public int findMemberLevelCount(String level) {
+	       List<Member> mbl=mRepo.findMemberLevel(level);
+	       int num=0;
+	       for(int i=0 ; i<mbl.size();i++) {
+	       	num++;
+	       }
+	       return num;
+		}
+	 
+	 
 	
 }

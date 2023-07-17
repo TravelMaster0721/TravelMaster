@@ -1,5 +1,9 @@
 package com.tm.TravelMaster.chih.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -40,12 +44,38 @@ public class RegisteredController {
 			mb.setMemberId(memberId.toUpperCase());
 			mb.setMemberAcc(memberAcc);
 			mb.setMemberPwd(memberPwd);
+			byte[] defaultPicture = readPictureFromFile();
+			mb.setMemberPhoto(defaultPicture);
 			mb.setAuth_provider("local");
 			mService.insertMember(mb);
 			m.addAttribute("registerSuccess", "註冊成功，請重新登入!");
 			return "chih/loginSystem";
 		
 	}
+	
+	public byte[] readPictureFromFile() {
+		String filePath = "src/main/resources/static/images/chih/user.png";
+        FileInputStream fis = null;
+        try {
+            File file = new File(filePath);
+            fis = new FileInputStream(file);
+            byte[] pictureBytes = new byte[(int) file.length()];
+            fis.read(pictureBytes);
+            return pictureBytes;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            // 关闭 FileInputStream
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 	
 	@ResponseBody
 	@GetMapping("/checkgoogleregistered.controller")
@@ -69,6 +99,7 @@ public class RegisteredController {
 	    request.setAttribute("memberMail", memberMail);	
 		return "chih/googleregistered";
 	}
+	
 	@PostMapping("/savegoogleregistered.controller")
 	public String googleRegisterMember(@RequestParam("membername") String memberName, @RequestParam("membersex") String memberSex,
 			@RequestParam("membermail") String memberMail, @RequestParam("memberphone") String memberPhone,
@@ -82,6 +113,8 @@ public class RegisteredController {
 			mb.setMemberAdd(memberAdd);;
 			mb.setMemberId(memberId.toUpperCase());
 			mb.setMemberAcc(memberMail);
+			byte[] defaultPicture = readPictureFromFile();
+			mb.setMemberPhoto(defaultPicture);
 			mb.setAuth_provider("google");
 			mService.insertMember(mb);
 			m.addAttribute("registerSuccess", "註冊成功，請重新登入!");

@@ -108,7 +108,7 @@ public class PlayoneController {
 		Member mb = mService.findById(1);
 		System.out.println(mb.getMemberSeq());
 		Playone playone = new Playone(pNick, pName, pSex, Integer.parseInt(pBirth), pInterest, pIntroduce,
-				playoneImgBeans, 0,1,mb);
+				playoneImgBeans, 1,0,null);
 		pService.insertPlayone(playone);
 
 		Playone playone1 = pService.findById(playone.getPlayoneId());

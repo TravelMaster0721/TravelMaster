@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.hibernate.annotations.Where;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tm.TravelMaster.chih.model.Member;
 
 import jakarta.persistence.CascadeType;
@@ -23,8 +24,8 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "playone")
-public class Playone  {
-	
+public class Playone {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "playoneId")
@@ -48,19 +49,25 @@ public class Playone  {
 	private int fixedValue;
 	@Column(name = "registered")
 	private int registered;
+
+	// 購物車使用
+	@Transient
+	private int playoneDays;
+
 	@OneToOne
-	@JoinColumn(name="memberSeq", referencedColumnName = "memberSeq")
-    private Member member;
-	
+	@JoinColumn(name = "memberSeq", referencedColumnName = "memberSeq")
+	private Member member;
+
 	@Transient
 	private int age;
 	@Transient
 	private String Zodiac;
-	
-	public Playone() {};
-	
-	public Playone(String playoneNick, String playoneName, String playoneSex, int playoneBirth,
-			String playoneInterest, String playoneIntroduce, List<PlayoneImg> playoneImgs, int fixedValue, int registered,Member member) {
+
+	public Playone() {
+	};
+
+	public Playone(String playoneNick, String playoneName, String playoneSex, int playoneBirth, String playoneInterest,
+			String playoneIntroduce, List<PlayoneImg> playoneImgs, int fixedValue, int registered, Member member) {
 		this.playoneNick = playoneNick;
 		this.playoneName = playoneName;
 		this.playoneSex = playoneSex;
@@ -72,4 +79,4 @@ public class Playone  {
 		this.registered = registered;
 		this.member = member;
 	}
-	}
+}

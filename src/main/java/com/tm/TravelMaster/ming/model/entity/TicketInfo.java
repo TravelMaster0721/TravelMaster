@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tm.TravelMaster.ming.model.dto.HighSpeedRailTicket;
 
 import jakarta.persistence.CascadeType;
@@ -14,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -63,6 +65,7 @@ public class TicketInfo {
 	@JoinColumn(name = "cart_Id")
 	// 這個是對應的物件 跟Table無關 純粹是告訴Hibernate對應關係 跟著他走
 	private TicketInfoGroup ticketInfoGroup;
+	
 	
 	public TicketInfo() {
 	}

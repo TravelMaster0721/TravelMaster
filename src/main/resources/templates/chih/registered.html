@@ -98,6 +98,7 @@
 								</div>
 				
 				                <div class="d-flex justify-content-end pt-3">
+				                  <input type="button" class="btn btn-warning btn-lg ms-2" value="自動填入" onclick="autoFill()"></input>
 				                  <input type="button" class="btn btn-warning btn-lg ms-2" value="清除" onclick="clearForm()"></input>
 				                  <input type="submit" class="btn btn-warning btn-lg ms-2 registered" value="註冊" disabled></input>
 				                </div>
@@ -151,18 +152,18 @@
 		  var checkPwdLength = document.getElementById("checkPwdLength");
 		  
 		  if(password.length<8){
-			  checkPwdLength.innerHTML = '<i class="fa-solid fa-xmark" style="color: #ff0000;"></i>';
+			  checkPwdLength.innerHTML = '<i class="fa-solid fa-xmark fa-lg" style="color: #ff0000;"></i>';
 			  checkPwdPass1=0;
 		  }else{
-			  checkPwdLength.innerHTML = '<i class="fa-solid fa-check" style="color: #fe0606;"></i>';
+			  checkPwdLength.innerHTML = '<i class="fa-solid fa-check fa-lg" style="color: #2ebd46;"></i>';
 			  checkPwdPass1=1;
 		  }
 		  
 		  if (password === checkpwd) {
-		    checkPwdSame.innerHTML = '<i class="fa-solid fa-check" style="color: #fe0606;"></i>';
+		    checkPwdSame.innerHTML = '<i class="fa-solid fa-check fa-lg" style="color: #2ebd46;"></i>';
 		    checkPwdPass2 = 1;
 		  } else {
-		    checkPwdSame.innerHTML = '<i class="fa-solid fa-xmark" style="color: #ff0000;"></i>';
+		    checkPwdSame.innerHTML = '<i class="fa-solid fa-xmark fa-lg" style="color: #ff0000;"></i>';
 		    checkPwdPass2 = 0;
 		  }
 
@@ -177,16 +178,16 @@
 		    success: function(response) {
 		      if (response === 'exists' || memberacc.length<8) {
 		        checkAccExists = 0;
-		        $('#checkAcc').html('<i class="fa-solid fa-xmark" style="color: #ff0000;"></i>');
+		        $('#checkAcc').html('<i class="fa-solid fa-xmark fa-lg" style="color: #ff0000;"></i>');
 		      } else {
 		        checkAccExists = 1;
-		        $('#checkAcc').html('<i class="fa-solid fa-check" style="color: #fe0606;"></i>');
+		        $('#checkAcc').html('<i class="fa-solid fa-check fa-lg" style="color: #2ebd46;"></i>');
 		      }
 
 		      updateButtonState();
 		    },
 		    error: function() {
-		      alert('发生错误，请重试！');
+		      alert('發生錯誤，請在嘗試！');
 		    }
 		  });
 		}
@@ -198,6 +199,24 @@
 		    $(".btn.btn-warning.btn-lg.ms-2.registered").prop("disabled", true);
 		  }
 		}
+		
+		function autoFill() {
+
+			  var membername = "Chung Chih";
+			  var membersex = "male";
+			  var membermail = "rypmt12358@gmail.com";
+			  var memberphone = "0912345678";
+			  var memberadd = "123 Main Street";
+			  var memberid = "A123456789";
+
+			  document.getElementById("membername").value = membername;
+			  document.getElementById("m1").checked = (membersex === "male");
+			  document.getElementById("f1").checked = (membersex === "female");
+			  document.getElementById("membermail").value = membermail;
+			  document.getElementById("memberphone").value = memberphone;
+			  document.getElementById("memberadd").value = memberadd;
+			  document.getElementById("memberid").value = memberid;
+			}
 
 	</script>
 </body>

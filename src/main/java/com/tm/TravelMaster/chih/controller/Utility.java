@@ -7,4 +7,5 @@ public class Utility {
 		String siteURL=request.getRequestURL().toString();
 		return siteURL.replace(request.getServletPath(), "");
 	}
+	
 }

@@ -1,6 +1,7 @@
 package com.tm.TravelMaster.yeh.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,16 +22,20 @@ public class ArticleLikeService {
 	
 	//移除讚
 	public void removeLike(ArticleLikeBean like) {
-		alRepo.delete(like);
+		System.out.println(" before   Executing removeLike method---------------------------------");
+		alRepo.deleteById(like.getArticleLikeId());
+		
+		System.out.println("Executing removeLike method---------------------------------------------");
 	}
 	
-	//透過文章ID 查該文章的讚有哪些
-    public List<ArticleLikeBean> getLikesByArticleId(Integer articleId) {
-        return alRepo.findByArticleArticleId(articleId);
+    
+    public List<ArticleLikeBean>findBymemberIdAndArticleId(String memberNum,Integer articleId){
+    	return alRepo.findByMemberMemberNumAndArticleArticleId(memberNum,articleId);
     }
     
-    public List<ArticleLikeBean>  findBymemberIdAndArticleId(String memberId,Integer articleId){
-    	return alRepo.findByMemberMemberNumAndArticleArticleId(memberId,articleId);
+    // 根據會員編號與文章編號查詢
+    public Optional<ArticleLikeBean> findByMemberNumAndArticleId(String memberNum, Integer articleId) {
+        return alRepo.findByMemberNumAndArticleId(memberNum, articleId);
     }
 	
 }

@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.tm.TravelMaster.ming.model.entity.PriceInfo;
 
-public interface PriceInfoRepository  extends JpaRepository<PriceInfo, Integer>{
+public interface PriceInfoRepository extends JpaRepository<PriceInfo, Integer>{
 
 }

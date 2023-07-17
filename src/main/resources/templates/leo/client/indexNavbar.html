@@ -29,9 +29,9 @@
 				<span class="navbar-toggler-icon"></span>
 			</button>
 
-			<a th:href="@{/playone}" class="navbar-brand mx-auto mx-lg-0"> <i
+			<a th:href="@{/layout/index}" class="navbar-brand mx-auto mx-lg-0"> <i
 				class="fa-solid fa-martini-glass-citrus"></i> <span
-				class="brand-text">TM 旅伴</span>
+				class="brand-text">TM</span>
 			</a>
 					
 
@@ -41,10 +41,7 @@
 						th:href="@{/layout/index}"><i class="fa-solid fa-house"></i></a></li>
 
 					<li class="nav-item"><a class="nav-link click-scroll"
-						th:href="@{#section_2}">About</a></li>
-
-					<li class="nav-item"><a class="nav-link click-scroll"
-						th:href="@{#section_3}"><i class="fa-solid fa-location-dot"></i> 景點</a>
+						th:href="@{/toSpot}"><i class="fa-solid fa-location-dot"></i> 景點</a>
 					</li>
 
 					<li class="nav-item"><a class="nav-link click-scroll"
@@ -97,8 +94,6 @@
 							  </a>
 							
 							  <ul class="dropdown-menu">
-							 	<li><a class="dropdown-item" th:href="@{#}">個人資料</a></li>
-							    <li><hr class="dropdown-divider" /></li>
 							 	<li><a class="dropdown-item" th:href="@{/layout/memberCenter}">會員中心</a></li>
 							    <li><hr class="dropdown-divider" /></li>
 							    <li><a class="dropdown-item" th:href="@{/logout.controller}">登出</a></li>

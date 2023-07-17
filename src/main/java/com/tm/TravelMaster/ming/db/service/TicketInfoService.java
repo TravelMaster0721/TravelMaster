@@ -88,15 +88,6 @@ public class TicketInfoService {
 	    return false;
 	}
 	
-	
-	public List<TicketInfo> findByDestinationST(String destinationST){
-		List<TicketInfo> ticketInfos = ticketInfoRepos.findByDestinationST(destinationST);
-		for(TicketInfo info : ticketInfos) {
-			info.setDestinationST(destinationST);
-		}
-		return ticketInfos;
- 	}
-	
 	// ShoppingCart CRUD
 	@Transactional(rollbackFor = SQLException.class)
 	public TicketInfoGroup insertShoppingCart(TicketInfoGroup cart)throws SQLException {

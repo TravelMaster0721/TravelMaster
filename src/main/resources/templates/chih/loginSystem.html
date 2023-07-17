@@ -19,11 +19,10 @@
 					<div class="col-lg-5 col-12 m-auto">
 						<div class="hero-text">
 							<div class="card-body p-5 text-center"
-								style="background-color: rgba(255, 255, 255, 0.9);">
-
-								<form action="checklogin.controller" method="post">
+								style="background-color: rgba(255, 255, 255, 0.9);">								
+								<!-- Login -->
+								<form action="checklogin.controller" method="post" th:if="${forgot != 'yes' && sendemail != 'yes' && reset!='ok'}">																		
 									<h3 class="mb-5">Sign in Now</h3>
-
 									<div class="form-outline mb-4">
 										<input type="text" id="memberacc"
 											class="form-control form-control-lg" name="memberacc"
@@ -37,32 +36,86 @@
 											placeholder="密碼" required /> <label class="form-label"
 											for="memberpwd"></label>
 									</div>
-									<div class="form-outline mb-4" th:if="${errorMessage}">
-							    <p class="text-danger" th:text="${errorMessage}"></p>
-							</div>
-									<!-- Checkbox -->
-									<div class="form-check d-flex justify-content-start mb-4">
-										<label class="form-check-label" for="form1Example3"></label> <i
-											style="margin-left: 29%;"><a th:href="@{/forgotpassword.controller}"
-											style="color: black">忘記密碼?</a></i> <i style="margin-left: 30px;"><a
-											th:href="@{/registered.controller}" style="color: black">註冊會員</a></i>
-
+									
+									<div class="form-outline mb-4" >
+									    <img id="captchaImage" th:src="@{/captcha}" alt="請輸入圖片驗證碼" style="width:30%;"/>
+									    <a type="button" href="#" style="width:10%;" onclick="changeCaptcha()" ><i class="fa-solid fa-arrows-rotate fa-lg" style="color: #739ade;"></i></a>
+									    <input type="text" class="form-control-lg" id="captcha" name="captcha" placeholder="驗證碼" required style="width:50%;"/>								    
+									    <label class="form-label"></label>
 									</div>
-
-									<button class="btn btn-primary btn-lg btn-block" type="submit">Login</button>
-
+																	
+									<div class="form-outline mb-4" th:if="${errorMessage}">									
+									    <p class="text-danger" th:text="${errorMessage}"></p>
+									</div>
+							
+									<div class="form-outline mb-4">
+										<button class="btn btn-primary btn-lg btn-block" type="submit">Login</button>
+									</div>
 								</form>
+								
+								<!-- forgot password send email -->
+								<form action="forgotpassword.controller" method="post" th:if="${forgot == 'yes'}">
+									<h3 class="mb-5" >Forgot Password</h3>
+									<div class="form-outline mb-4" th:if="${sendsuccess != 'ok'}" >
+										<input type="text" id="email" style="width:400px"
+											class="form-control form-control-lg" name="email"
+											placeholder="請輸入您的信箱" required /> <label class="form-label"
+											for="email"></label>
+									</div>
+									<div class="form-outline mb-4" th:if="${sendsuccess == 'ok'}">
+										<input type="text" id="email"
+											class="form-control form-control-lg" name="email" th:value="${currectemail}" disabled/> <label class="form-label"
+											for="email"></label>
+									</div>									
+									<div class="form-outline mb-4" th:if="${message}">									
+									    <p class="text-danger" th:text="${message}"></p>
+									</div>
+									
+									<div class="form-outline mb-4">
+										<button class="btn btn-primary btn-lg btn-block" type="submit">送出</button>
+									</div>
+								</form>
+								
+								<!-- reset password -->
+								<form action="resetpassword.controller" method="post" th:if="${reset == 'ok'}">
+									<h3 class="mb-5">Reset your Password</h3>
+									<div class="form-outline mb-4">
+										<input type="password" id="memberpwd"
+											class="form-control form-control-lg" name="memberpwd"
+											placeholder="新密碼" required /> <label class="form-label"
+											for="memberpwd"></label>
+									</div>
+									<div class="form-outline mb-4">
+										<input type="password" id="checkmemberpwd"
+											class="form-control form-control-lg" name="checkmemberpwd"
+											placeholder="確認密碼" required /> <label class="form-label"
+											for="checkmemberpwd"></label>
+									</div>								
+									<div class="form-outline mb-4" th:if="${message}">									
+									    <p class="text-danger" th:text="${message}"></p>
+									</div>
+									<div><input type="hidden" id="token" name="token" th:value="${token}"></div>
+									<div class="form-outline mb-4">
+										<button class="btn btn-primary btn-lg btn-block" type="submit">送出</button>
+									</div>
+								</form>
+								
+								<div class="form-check d-flex justify-content-center mb-4">
+								    <label class="form-check-label" for="form1Example3"></label>
+								    <div style="margin-left:-30px;">
+								        <a th:href="@{/forgotpassword.controller}" style="color: black">忘記密碼?&nbsp;&nbsp;&nbsp;</a>
+								    </div>
+								    <div>
+								        <a th:href="@{/registered.controller}" style="color: black">註冊會員</a>
+								    </div>
+								</div>
 									<hr class="my-4">
 
 									<button class="btn btn-lg btn-block btn-primary" id="google_login"
 										style="background-color: #dd4b39;" type="button">
 										<i class="fab fa-google me-2"></i> Sign in with google
 									</button>
-									<button class="btn btn-lg btn-block btn-primary mb-2"
-										style="background-color: #3b5998; margin-top: 8px"
-										type="button">
-										<i class="fab fa-facebook-f me-2"></i>Sign in with facebook
-									</button>
+									
 								
 								<input id="registerSuccess" type="hidden" th:value="${registerSuccess}">
 								<div id="persoanl_info"></div>
@@ -85,7 +138,11 @@
 			</div>
 		</section>
 	</main>
+	<div style="float: right;">
+		<a href="/TM/fastlogin?n=0">管理員</a><span>&nbsp&nbsp</span><a href="/TM/fastlogin?n=1">一般使用者</a>
+	</div>
 <div th:replace="~{layout/indexFooter}"></div>
+
 
 <!-- JAVASCRIPT FILES -->
 	<script th:src="@{js/index/jquery.min.js}"></script>
@@ -217,6 +274,19 @@
 		}
 	});
 	
+	function changeCaptcha() {
+        $.ajax({
+            url: "http://localhost:8080/TM/captcha",
+            type: "GET",
+            success: function (data) {
+                $("#captchaImage").attr("src", "/TM/captcha?" + Date.now());
+            },
+            error: function (error) {
+                console.error(error);
+            }
+        });
+    }
+	
 	function sendUserDataToController(name, imgUrl, gender, email) {
 	    $.ajax({
 	        url: "/TM/checkgoogleregistered.controller",
@@ -243,6 +313,17 @@
 	    });
 	}
 	
+	$("#captchaImage").click(function(){
+		$.ajax({
+			url: "http://localhost:8080/TM/checkcaptcha",
+			type: "get",
+			success: function(response){
+				$("#captcha").val(response);
+			}
+		})
+	})
+	
 	</script>
+	
 </body>
 </html>

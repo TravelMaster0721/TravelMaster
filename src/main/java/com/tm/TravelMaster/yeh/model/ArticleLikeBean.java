@@ -51,5 +51,12 @@ public class ArticleLikeBean {
 	public void setArticle(ArticleBean article) {
 		this.article = article;
 	}
+
+	@Override
+	public String toString() {
+		return "ArticleLikeBean [articleLikeId=" + articleLikeId + ", member=" + member + ", article=" + article + "]";
+	}
+	
+	
 	
 }

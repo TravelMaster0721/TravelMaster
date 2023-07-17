@@ -95,10 +95,9 @@
 											</p>
 						                </div>
 						            </div>
-						            <div class="price" th:text="3000"></div>
+						            <div class="price" th:text="'3000 日'"></div>
 						            <div>
-						                <input type="number" name="playoneRegistrations" th:value="1" min="1" class="quantity-field playone-quantity-field"
-						                    th:data-price="3000" />
+										<input type="number" name="playoneDays" th:value="${playone.playoneDays > 0 ? playone.playoneDays : 1}" min="1" class="quantity-field playone-quantity-field" data-price="3000" />
 						                <input type="hidden" name="playoneId" th:value="${playone.playoneId}" class="playoneId" />
 						                <input type="hidden" name="playoneName" th:value="${playone.playoneName}" />
 						                <input type="hidden" name="playonePrice" th:value="3000" />
@@ -126,19 +125,20 @@
 						                            <strong th:text="${ticket.destinationST}"></strong>
 						                        </h1>
 						                        <p>
-						                            出發時間:
-						                            <span th:text="${ticket.departuretime}"></span>
-						                        </p>
-						                        <p>
+						                            出發:
+						                            <span th:text="${ticket.departuredate}"></span>
+						                            <br>
+						                            <span th:text="${'時間: ' + ticket.departuretime}"></span>
+						                            <br>
 						                            <span th:text="${'班次: ' + ticket.tranNo}"></span>
-						                            &nbsp;
+						                            <br>
 						                            <span th:text="${'座位: ' + ticket.seat}"></span>
 						                        </p>
 						                    </div>
 						                </div>
 						                <div class="price" th:text="${ticket.price}"></div>
 						                <div>
-						                    <input type="number" name="ticketRegistrations" th:value="1" min="1" class="quantity-field ticket-quantity-field"
+						                    <input type="text" disabled name="ticketRegistrations" th:value="1" min="1" class="quantity-field ticket-quantity-field"
 						                        th:data-price="3000" />
 						                    <input type="hidden" name="ticketId" th:value="${ticket.ticketID}" class="ticketId" />
 						                    <input type="hidden" name="ticketPrice" th:value="${ticket.price}" />
@@ -153,7 +153,7 @@
 						</th:block>
 						
 						<!-- 當購物車為空時顯示的提示訊息 -->
-							<div th:if="${#lists.isEmpty(products) && #lists.isEmpty(playones)}">
+							<div th:if="${isCartEmpty}">
 							    <h5>您的購物車是空的，快去挑選一些行程吧！</h5>
 							    <button onclick="goToProductPage()">去購物</button>
 							</div>

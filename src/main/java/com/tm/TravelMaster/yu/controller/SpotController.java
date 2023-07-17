@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.tm.TravelMaster.yu.model.Spot;
 import com.tm.TravelMaster.yu.service.SpotService;
@@ -20,58 +19,53 @@ import com.tm.TravelMaster.yu.service.SpotService;
 public class SpotController {
 	
 	@Autowired
-	private SpotService spotService;
+	private SpotService spService;
 	
 	@GetMapping("")
     public String query(Model model) {
-        List<Spot> spots = spotService.findAll();
+        List<Spot> spots = spService.findAll();
         model.addAttribute("spots", spots);
-        return "yu/Result";
+        return "yu/spotAdmin";
     }
 
     @GetMapping("/insert")
     public String insert(Model model) {
-	    model.addAttribute("cityNames", spotService.getAllCityNames());
-	    model.addAttribute("spotTypes", spotService.getAllSpotTypes());
-        return "yu/Insert";
+    	model.addAttribute("cityRegions", spService.getAllCityRegions());
+	    model.addAttribute("cityNames", spService.getAllCityNames());
+	    model.addAttribute("spotTypes", spService.getAllSpotTypes());
+        return "yu/updateSpotAdmin";
     }
  
     @GetMapping("/update")
     public String update(@RequestParam("id") String id, Model model) {
-        Spot spots = spotService.findById(Integer.parseInt(id));
-	    model.addAttribute("cityNames", spotService.getAllCityNames());
-	    model.addAttribute("spotTypes", spotService.getAllSpotTypes());
+        Spot spots = spService.findById(Integer.parseInt(id));
+        model.addAttribute("cityRegions", spService.getAllCityRegions());
+	    model.addAttribute("cityNames", spService.getAllCityNames());
+	    model.addAttribute("spotTypes", spService.getAllSpotTypes());
         model.addAttribute("spots", spots);
-        return "yu/Insert";
+        return "yu/updateSpotAdmin";
     }
     
     @PostMapping("/doAction")
     public String doAction(@ModelAttribute("spots") Spot spots, @RequestParam("action") String action) {
     	if(action.equals("doInsert")) {
-    		spotService.insert(spots);
+    		spService.insert(spots);
     	}else if(action.equals("doUpdate")) {
-    		spotService.update(spots);
+    		spService.update(spots);
     	}
     	return "redirect:/spotList";
     }
  
     @GetMapping("/delete")
     public String delete(@RequestParam("spotNo") Integer spotNo) {
-        spotService.deleteById(spotNo);
+        spService.deleteById(spotNo);
         return "redirect:/spotList";
     }
     
-    
-    @GetMapping("/toSpot")
-	public String toSpot() {
-		return "yu/Index";
+    @GetMapping("/chart")
+	public String chart() {
+		return "yu/spotChart";
 	}
-	
-	@GetMapping("/allSpot")
-    public String showAllSpot(Model model) {
-        List<Spot> spots = spotService.findAll();
-        model.addAttribute("spots", spots);
-        return "yu/AllSpot";
-    }
+    
 }
 
