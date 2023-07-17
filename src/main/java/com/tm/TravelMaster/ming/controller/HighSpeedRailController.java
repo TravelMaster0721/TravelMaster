@@ -19,7 +19,7 @@ import com.tm.TravelMaster.ming.model.entity.TicketInfo;
 public class HighSpeedRailController {
 
 	@Autowired
-	private TicketInfoService ticketsService;
+	private TicketInfoService ticketsService; 
 
 	@Autowired
 	private HighSpeedRailService highSpeedRailService;
