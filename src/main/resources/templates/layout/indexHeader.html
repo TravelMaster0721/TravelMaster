@@ -39,23 +39,22 @@
 
 			<div class="collapse navbar-collapse" id="navbarNav">
 				<ul class="navbar-nav ms-auto">
-					<li class="nav-item"><a class="nav-link click-scroll" th:href="@{#section_1}"><i
+					<li class="nav-item"><a class="nav-link click-scroll" th:href="@{/layout/index}"><i
 								class="fa-solid fa-house"></i></a></li>
 
-					<li class="nav-item"><a class="nav-link click-scroll" th:href="@{#section_2}">About</a></li>
 
-					<li class="nav-item"><a class="nav-link click-scroll" th:href="@{#section_3}"><i
+					<li class="nav-item"><a class="nav-link click-scroll" th:href="@{/toSpot}"><i
 								class="fa-solid fa-location-dot"></i> 景點</a>
 					</li>
 
-					<li class="nav-item"><a class="nav-link click-scroll" th:href="@{#section_4}"><i
+					<li class="nav-item"><a class="nav-link click-scroll" th:href="@{/sean/productPageByCount}"><i
 								class="fa-solid fa-calendar-days"></i> 行程</a>
 					</li>
 
 					<li class="nav-item"><a class="nav-link click-scroll" th:href="@{/select}"><i
 								class="fa-solid fa-ticket"></i> 交通</a></li>
 
-					<li class="nav-item"><a class="nav-link click-scroll" th:href="@{#section_6}"><i
+					<li class="nav-item"><a class="nav-link click-scroll" th:href="@{/playone}"><i
 								class="fa-solid fa-face-smile-wink"></i>
 							旅伴</a></li>
 
@@ -70,29 +69,42 @@
 
 
 					<li class="nav-item" th:if="${session.mbsession == null}">
-						<a class="nav-link custom-btn btn d-none d-lg-block" th:href="@{/login.controller}">
-							<i class="fa-solid fa-arrow-right-to-bracket"></i> 登入
-						</a>
+					    <a class="nav-link custom-btn btn d-none d-lg-block" th:href="@{/login.controller}">
+					        <i class="fa-solid fa-arrow-right-to-bracket"></i> 登入
+					    </a>
 					</li>
 
-					<li class="nav-item" th:if="${session.mbsession != null}">
-						<div class="dropdown">
-							<a class="nav-link custom-btn btn btn-secondary dropdown-toggle" href="#" role="button"
-								data-bs-toggle="dropdown" aria-expanded="false">
-								Hi,[[${session.mbsession.memberName}]]
-							</a>
-
-							<ul class="dropdown-menu">
-								<li><a class="dropdown-item" th:href="@{/}">後台管理</a></li>
-								<li><a class="dropdown-item" th:href="@{/logout.controller}">登出</a></li>
-							</ul>
+					<li class="nav-item" th:if="${session.mbsession != null && session.mbsession.memberLevel=='super_user'}">	
+						<div class="dropdown" >
+							  <a class="nav-link custom-btn btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							    Hi,[[${session.mbsession.memberName}]]
+							  </a>
+							
+							  <ul class="dropdown-menu">
+							    <li><a class="dropdown-item" th:href="@{/tobackstage.controller}">後台管理</a></li>
+							    <li><hr class="dropdown-divider" /></li>
+							    <li><a class="dropdown-item" th:href="@{/layout/memberCenter}">會員中心</a></li>
+							    <li><hr class="dropdown-divider" /></li>	
+							    <li><a class="dropdown-item" th:href="@{/logout.controller}">登出</a></li>
+							  </ul>
 						</div>
 					</li>
-
+					
+					<li class="nav-item" th:if="${session.mbsession != null && session.mbsession.memberLevel=='normal_user'}">	
+						<div class="dropdown" >
+							  <a class="nav-link custom-btn btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							    Hi,[[${session.mbsession.memberName}]]
+							  </a>
+							
+							  <ul class="dropdown-menu">
+							 	<li><a class="dropdown-item" th:href="@{/layout/memberCenter}">會員中心</a></li>
+							    <li><hr class="dropdown-divider" /></li>
+							    <li><a class="dropdown-item" th:href="@{/logout.controller}">登出</a></li>
+							  </ul>
+						</div>
+					</li>
 				</ul>
-
 			</div>
-
 
 	</nav>
 	<!-- SweetAlert JavaScript -->
@@ -104,6 +116,7 @@
 	<script th:src="@{/js/index/jquery.sticky.js}"></script>
 	<script th:src="@{/js/index/custom.js}"></script>
 	<script src="https://kit.fontawesome.com/0a9f356c66.js" th:crossorigin="anonymous"></script>
+	
 
 </body>
 

@@ -46,9 +46,12 @@ public class HighSpeedRailWebService {
 	// 使用者頁面 查詢時刻表區間 (使用Page做分頁)
 	@GetMapping(value = "/GetTranInfo", produces = "application/json; charset=utf-8")
 	@ResponseBody
-	public String GetTranInfo(@RequestParam("departureST") String departureST,
-			@RequestParam("destinationST") String destinationST, @RequestParam("departureTime") String departureTime,
-			@RequestParam(name = "p", defaultValue = "1") Integer pageNumber, Model model) {
+	public String GetTranInfo(
+			@RequestParam("departureST") String departureST,
+			@RequestParam("destinationST") String destinationST,
+			@RequestParam("departureTime") String departureTime,
+			@RequestParam(name = "p", defaultValue = "1") Integer pageNumber, 
+			Model model) {
 
 		Page<TrainTimeInfo> trainTimeInfos = highSpeedRailService.findByPage(departureST, destinationST, departureTime,
 				pageNumber);
@@ -170,7 +173,7 @@ public class HighSpeedRailWebService {
 		for (int i = leastYear; i <= currentYear; i++) {
 			departureDates_allYear.add(String.format("%d-01-01", i)); // All years
 			// 把每一年的每個月分 丟到List 裡面
-			if ((currentYear - i) <= 3) { // 3 years
+			if ((currentYear - i) <= 2) { // 3 years
 				for (String monthStr : monthsStr) {
 					departureDates_3Year.add(String.format("%d-%s-01", i, monthStr));
 				}
@@ -228,7 +231,7 @@ public class HighSpeedRailWebService {
 		List<String> thisYearIncome = new ArrayList<>();
 		
 		allYearIncome.add("全年度訂票收益");
-		for (int i = 1; i < departureDates_allYear.size(); i++) { // 跳過第一個(因為是 "x")
+ 		for (int i = 1; i < departureDates_allYear.size(); i++) { // 跳過第一個(因為是 "x")
 			allYearIncome.add(Integer.toString(allYearIncomeMap.get(departureDates_allYear.get(i))));
 		}
 		Last3YearIncome.add("近三年訂票收益");

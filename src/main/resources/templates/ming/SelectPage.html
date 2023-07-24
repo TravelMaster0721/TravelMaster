@@ -75,12 +75,12 @@
 						<div class="container" id="queryResult" style="display: none">
 							<div class="row ">
 								<div class="col d-flex justify-content-start">
-									<div id="from_st" class="d-inline p-2 fs-5"></div>
 									<!--  出發站 -->
+									<div id="from_st" class="d-inline p-2 fs-5"></div>
 									<div class="d-inline p-2 fs-5">
+									<!-- 箭頭 -->
 										<i class="fa-solid fa-arrow-right"></i>
 									</div>
-									<!-- 箭頭 -->
 									<div id="to_st" class="d-inline p-2 fs-5"></div>
 									<!-- 抵達站 -->
 									<div id="dep_date" class="d-inline p-2 fs-5"></div>
@@ -122,7 +122,6 @@
 
 	<script th:inline="javascript">
 	var priceInfos = new Map();
-	var basePath = window.location.protocol + "//" + window.location.hostname + ":" + location.port + '/TM';
 	let tmpS;
 
 	$(document).ready(function() {

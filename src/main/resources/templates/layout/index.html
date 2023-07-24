@@ -46,7 +46,7 @@
 					th:href="@{#section_2}">About</a></li>
 
 				<li class="nav-item"><a class="nav-link click-scroll"
-					th:href="@{#section_3}"><i class="fa-solid fa-location-dot"></i>
+					th:href="@{/toSpot}"><i class="fa-solid fa-location-dot"></i>
 						景點</a></li>
 
 				<li class="nav-item"><a class="nav-link click-scroll"
@@ -70,7 +70,7 @@
 				<li class="nav-item"><a class="nav-link click-scroll"
 					th:href="@{#section_8}"><i class="fa-solid fa-phone"></i> 聯繫</a></li>
 
-				<li class="nav-item" th:if="${session.mbsession == null}">
+					<li class="nav-item" th:if="${session.mbsession == null}">
 					    <a class="nav-link custom-btn btn d-none d-lg-block" th:href="@{/login.controller}">
 					        <i class="fa-solid fa-arrow-right-to-bracket"></i> 登入
 					    </a>
@@ -106,68 +106,6 @@
 						</div>
 					</li>						
 				</ul>
-			</div>
-			<div id="myModal" class="modal" th:if="${session.mbsession != null}">
-			    <div class="modal-content">
-			    	<div class="header">
-			        	<div class="title-container">
-		                	<span class="title">個人資料</span>
-		            	</div>
-		            	<span class="close" onclick="closeModal()">&times;</span>
-			        </div>
-			        
-			        	  <div class="mb-3">
-						    <label class="form-label">會員編號</label>
-						    <input type="text" class="form-control" id="membernum" name="membernum" disabled th:value="${session.mbsession.memberNum}">
-						  </div>
-						  <div class="mb-3">
-						    <label for="membername" class="form-label">姓名</label>
-						    <input type="text" class="form-control" id="membername" disabled th:value="${session.mbsession.memberName}">
-						  </div>
-						  <div class="mb-3">
-						    <label class="form-label">性別</label>
-						    <input type="text" class="form-control" id="membersex" disabled th:value="${session.mbsession.memberSex}">
-						  </div>
-						  <div class="mb-3">
-						    <label for="membername" class="form-label">信箱</label>
-						    <input type="email" class="form-control" id="membermail" name="membermail" disabled th:value="${session.mbsession.memberMail}">
-						  </div>
-						  <div class="mb-3">
-						    <label for="membername" class="form-label">電話</label>
-						    <input type="tel" class="form-control" id="memberphone" name="memberphone" disabled th:value="${session.mbsession.memberPhone}">
-						  </div>
-						  <div class="mb-3">
-						    <label for="membername" class="form-label">地址</label>
-						    <input type="text" class="form-control" id="memberadd" name="memberadd" disabled th:value="${session.mbsession.memberAdd}">
-						  </div>
-						  <div class="mb-3">
-						    <label class="form-label">身分證</label>
-						    <input type="text" class="form-control" disabled th:value="${session.mbsession.memberId}">
-						  </div>
-						  <div class="mb-3">
-						    <label class="form-label">帳號</label>
-						    <input type="text" class="form-control" disabled th:value="${session.mbsession.memberAcc}">
-						  </div>
-						  <div class="mb-3">
-						    <label for="memberpwd" class="form-label">密碼</label>
-						    <input type="password" class="form-control" id="memberpwd" name="memberpwd" disabled th:value="${session.mbsession.memberPwd}">
-						  </div>
-						<form th:action="@{/updatepersonalmember.controller}" th:method="PUT">
-								<div style="display: flex;justify-content: center;align-items: center;">
-							    	<input type="button" class="updateBtn btn btn-secondary" id="updateBtn" value="修改">
-							    </div>
-							    <input type="hidden" id="check" name="check" value="">
-							    <input type="hidden" id="num1" name="membernum" th:value="${''}">
-							    <input type="hidden" id="name1" name="membername" th:value="${''}">
-							    <input type="hidden" id="email1" name="membermail" th:value="${''}">
-							    <input type="hidden" id="phone1" name="memberphone" th:value="${''}">
-							    <input type="hidden" id="address1" name="memberadd" th:value="${''}">
-							    <input type="hidden" id="password1" name="memberpwd" th:value="${''}">
-							    <div style="display: flex;justify-content: center;align-items: center;">
-							    	<input type="submit" class="saveBtn btn btn-danger" id="saveBtn" value="確認" style="display: none;">
-							    </div>
-							</form>
-			    </div>
 			</div>
 </nav>
 
@@ -220,7 +158,7 @@
 					<a class="custom-btn btn custom-link mt-3" th:href="@{#section_4}">查看熱門行程</a>
 
 					<a class="custom-btn custom-border-btn btn custom-link mt-3 me-3"
-						th:href="@{#section_3}">搜尋熱門景點</a>
+						th:href="@{/toSpot}">查看熱門景點</a>
 
 				</div>
 
@@ -507,116 +445,7 @@
 			</div>
 		</div>
 	</section>
-
-	<section class="pricing section-padding">
-		<div class="container">
-			<div class="row">
-
-				<div class="col-lg-10 col-12 text-center mx-auto mb-5">
-					<h2>
-						Get Your <a th:href="@{/select}"><span class="text-info"
-							style="text-decoration: underline;">Tickets</span></a>
-					</h2>
-				</div>
-
-				<div class="col-lg-4 col-md-6 col-12 mb-5 mb-lg-0">
-					<div class="pricing-thumb bg-white shadow-lg">
-						<div class="pricing-title-wrap d-flex align-items-center">
-
-							<h4 class="pricing-title text-white mb-0">Early Bird</h4>
-
-							<h5 class="pricing-small-title text-white mb-0 ms-auto">$640</h5>
-						</div>
-
-						<div class="pricing-body">
-							<p>
-								<i class="bi-cup me-2"></i> All-Day Coffee + Snacks
-							</p>
-
-							<p>
-								<i class="bi-controller me-2"></i> After Party
-							</p>
-
-							<p>
-								<i class="bi-chat-square me-2"></i> 24/7 Support
-							</p>
-
-							<div class="border-bottom pb-3 mb-4"></div>
-
-							<p>Quick group meetings for multiple teams</p>
-
-							<a class="custom-btn btn mt-3" th:href="@{/}"><i
-								class="fa-solid fa-arrow-right-to-bracket"></i> 登入</a>
-						</div>
-					</div>
-				</div>
-
-				<div class="col-lg-4 col-md-6 col-12 mb-5 mb-lg-0">
-					<div class="pricing-thumb bg-white shadow-lg">
-						<div class="pricing-title-wrap d-flex align-items-center">
-
-							<h4 class="pricing-title text-white mb-0">Gold</h4>
-
-							<h5 class="pricing-small-title text-white mb-0 ms-auto">$840</h5>
-						</div>
-
-						<div class="pricing-body">
-							<p>
-								<i class="bi-cup me-2"></i> All-Day Coffee + Snacks
-							</p>
-
-							<p>
-								<i class="bi-boombox me-2"></i> Group Meetings + After Party
-							</p>
-
-							<p>
-								<i class="bi-chat-square me-2"></i> 24/7 Support + Instant Chats
-							</p>
-
-							<div class="border-bottom pb-3 mb-4"></div>
-
-							<p>Quick group meetings for multiple teams</p>
-
-							<a class="custom-btn btn mt-3" th:href="@{/}">登入</a>
-						</div>
-					</div>
-				</div>
-
-				<div class="col-lg-4 col-md-6 col-12">
-					<div class="pricing-thumb bg-white shadow-lg">
-						<div class="pricing-title-wrap d-flex align-items-center">
-
-							<h4 class="pricing-title text-white mb-0">Platinum</h4>
-
-							<h5 class="pricing-small-title text-white mb-0 ms-auto">$1,240</h5>
-						</div>
-
-						<div class="pricing-body">
-							<p>
-								<i class="bi-cash me-2"></i> Cashback $200
-							</p>
-
-							<p>
-								<i class="bi-boombox me-2"></i> Private Meetings + After Party
-							</p>
-
-							<p>
-								<i class="bi-chat-square me-2"></i> 24/7 Support + Instant Chats
-							</p>
-
-							<div class="border-bottom pb-3 mb-4"></div>
-
-							<p>group talks and private chats for multiple teams</p>
-
-							<a class="custom-btn btn mt-3" th:href="@{/}">登入</a>
-						</div>
-					</div>
-				</div>
-
-			</div>
-		</div>
-	</section>
-
+	
 	<section class="venue section-padding" id="section_6">
 		<div class="container">
 			<div class="row">
@@ -674,7 +503,7 @@
 				<div class="col-lg-8 col-12 mx-auto">
 					<form class="custom-form contact-form bg-white shadow-lg" action=""
 						method="post" role="form">
-						<h2>Please Say Hi</h2>
+						<h2>Contact with us  ! </h2>
 
 						<div class="row">
 							<div class="col-lg-4 col-md-4 col-12">
@@ -689,8 +518,8 @@
 							</div>
 
 							<div class="col-lg-4 col-md-4 col-12">
-								<input type="text" name="subject" id="subject"
-									class="form-control" placeholder="Subject">
+								<input type="text" name="Title" id="Title"
+									class="form-control" placeholder="Title">
 							</div>
 
 							<div class="col-12">

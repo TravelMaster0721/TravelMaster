@@ -15,7 +15,6 @@ $(document).ready(function() {
 
 function insertRecord() {
 	location.href = `highSpeedRail/insert`;
-
 }
 
 function updateTarget(id) {

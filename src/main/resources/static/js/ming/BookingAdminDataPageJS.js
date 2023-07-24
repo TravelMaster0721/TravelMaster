@@ -1,5 +1,4 @@
 var priceInfos = new Map();
-var basePath = window.location.protocol + "//" + window.location.hostname + ":" + location.port + '/TM';
 let tmpS;
 
 $(document).ready(function() {

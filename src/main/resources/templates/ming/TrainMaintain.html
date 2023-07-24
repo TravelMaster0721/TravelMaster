@@ -143,12 +143,9 @@
 		var ACTION_STATE = 0;
 		$(document).ready(function () {
 			dtDataList = JSON.parse(document.querySelector("#dataTableContent").value);
+			console.log(dtDataList);
 			$('#queryResult').DataTable({
 				data: dtDataList,
-				/*render: function (data, type) {
-					document.querySelectorAll('td').css('background', '#FFF5EE');
-					return data;
-				}*/
 			});
 			EditField = new bootstrap.Modal(document.getElementById('EditField'));
 		});

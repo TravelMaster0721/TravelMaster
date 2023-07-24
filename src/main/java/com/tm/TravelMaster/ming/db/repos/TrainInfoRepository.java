@@ -16,6 +16,8 @@ public interface TrainInfoRepository extends JpaRepository<TranInfo, Integer> {
 	@Modifying
 	@Query(value = "update TranInfo set TrainArrivalTime=:trainArrvialTime "
 			+ "where TranNo=:tranNo AND StationID=:stationID", nativeQuery = true)
-	public void updateByTranNoAndStationID(@Param("tranNo") String tranNo, @Param("stationID") String stationID,
+	public void updateByTranNoAndStationID(
+			@Param("tranNo") String tranNo, 
+			@Param("stationID") String stationID,
 			@Param("trainArrvialTime") String trainArrvialTime);
 }

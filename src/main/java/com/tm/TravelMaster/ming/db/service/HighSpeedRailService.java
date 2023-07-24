@@ -146,6 +146,7 @@ public class HighSpeedRailService {
 		}
 	}
 
+	//批次匯入CSV時刻表
 	@Transactional(rollbackFor = SQLException.class)
 	public boolean insertTranInfoByCSV(String tInfo_csv) throws SQLException {
 		boolean uploadResult = true;
@@ -207,7 +208,6 @@ public class HighSpeedRailService {
 	// 編輯時刻表
 	@Transactional
 	public void updateByTranNoAndStationID(TranInfo tif) {
-
 		tranInfoRepos.updateByTranNoAndStationID(tif.getTranNo(), Integer.toString(tif.getStationID()),
 				tif.getTrainArrvialTime());
 	}

@@ -34,20 +34,19 @@ public class TrainMaintainController {
 	public String index(Model model) {
 		List<TranInfo> list = highSpeedRailService.findAllTranInfo();
 
-		Map<String, String> trainInfoMap = new HashMap<>(); // [102,1 -> 12:00],[102,2 -> 12:15]
+		Map<String, String> trainInfoMap = new HashMap<>(); // 時刻表[102,1 -> 12:00],[102,2 -> 12:15]
 		for (TranInfo info : list) {
 			String key = info.getTranNo() + "," + info.getStationID();
 			String value = info.getTrainArrvialTime();
 			trainInfoMap.put(key, value);
 		}
 
-		Set<String> trainNoSet = new HashSet<>();
-		
+		Set<String> trainNoSet = new HashSet<>(); //班次
 		for (TranInfo info : list) {
 			trainNoSet.add(info.getTranNo());
 		}
 
-		List<StationInfo> stationList = highSpeedRailService.findAllStationInfo();
+		List<StationInfo> stationList = highSpeedRailService.findAllStationInfo(); //站別
 
 		// --- ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ dataTable
 		List<List<String>> dataTableContentList = new ArrayList<List<String>>();

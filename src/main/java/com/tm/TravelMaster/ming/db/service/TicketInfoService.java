@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.tm.TravelMaster.ming.db.repos.ShoppingCartRepository;
+import com.tm.TravelMaster.ming.db.repos.TicketInfoGroupRepository;
 import com.tm.TravelMaster.ming.db.repos.TicketInfoRepository;
 import com.tm.TravelMaster.ming.model.entity.TicketInfoGroup;
 import com.tm.TravelMaster.ming.model.entity.TicketInfo;
@@ -21,7 +21,7 @@ public class TicketInfoService {
 	private TicketInfoRepository ticketInfoRepos;
 	
 	@Autowired
-	private ShoppingCartRepository shoppingCartRepos;
+	private TicketInfoGroupRepository shoppingCartRepos;
 	
 	// TicketInfo CRUD
 	

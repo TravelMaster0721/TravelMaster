@@ -14,6 +14,7 @@ import lombok.Data;
 @Entity @Table(name = "PriceInfo")
 @Data
 public class PriceInfo {
+	
 	@EmbeddedId
 	private PriceInfo_PK pk;
 	
